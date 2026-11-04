@@ -146,10 +146,6 @@ export default function PlanPage() {
     }
   };
 
-  const prevStep = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
   const getStepTitle = () => {
     switch (step) {
       case 1: return 'How are you getting to Ithaca?';
