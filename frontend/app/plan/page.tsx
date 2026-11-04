@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
 type TripData = {
@@ -165,11 +165,38 @@ export default function PlanPage() {
     }
   };
 
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (step === 4) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      calculatePartial();
+    }, 300);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    tripData.travelMode,
+    tripData.oneWayDistance,
+    tripData.tripType,
+    tripData.vehicles,
+    tripData.partySize,
+    tripData.accommodationType,
+    tripData.nights,
+    tripData.rooms,
+    tripData.localDrivingMiles,
+    tripData.transitMilesPerPerson,
+    tripData.localTransportDays,
+    tripData.days,
+    step,
+  ]);
+
   const nextStep = async () => {
     if (step === 3) {
       calculateFootprint();
     } else {
-      await calculatePartial();
       setStep(step + 1);
     }
   };
