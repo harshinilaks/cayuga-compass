@@ -60,6 +60,8 @@ export default function PlanPage() {
     activities_total: number;
     total: number;
   }>({ arrival: 0, lodging: 0, activities_total: 0, total: 0 });
+  const [distanceLoading, setDistanceLoading] = useState(false);
+  const [distanceInfo, setDistanceInfo] = useState<string | null>(null);
 
   const transportationModes = [
     { id: 'air_short', label: 'Plane', icon: '✈' },
@@ -165,7 +167,32 @@ export default function PlanPage() {
     }
   };
 
+  const lookupDistance = async (origin: string, travelMode: string) => {
+    if (!origin.trim()) return;
+    setDistanceLoading(true);
+    setDistanceInfo(null);
+    try {
+      const isFlight = travelMode.startsWith('air_');
+      const mode = isFlight ? 'flying' : 'driving';
+      const response = await fetch(
+        `http://localhost:8000/api/distance/?origin=${encodeURIComponent(origin)}&mode=${mode}`
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setTripData((prev) => ({ ...prev, oneWayDistance: data.distance_miles }));
+        setDistanceInfo(`${data.distance_miles} miles from ${data.destination} (${data.source})`);
+      } else {
+        setDistanceInfo(data.detail || 'Could not find that location');
+      }
+    } catch (error) {
+      setDistanceInfo('Distance lookup unavailable');
+    } finally {
+      setDistanceLoading(false);
+    }
+  };
+
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const distanceDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (step === 4) return;
@@ -192,6 +219,22 @@ export default function PlanPage() {
     tripData.days,
     step,
   ]);
+
+  // Distance lookup when origin or travel mode changes
+  useEffect(() => {
+    if (distanceDebounceRef.current) clearTimeout(distanceDebounceRef.current);
+    if (!tripData.origin.trim()) {
+      setDistanceInfo(null);
+      return;
+    }
+    distanceDebounceRef.current = setTimeout(() => {
+      lookupDistance(tripData.origin, tripData.travelMode);
+    }, 800);
+    return () => {
+      if (distanceDebounceRef.current) clearTimeout(distanceDebounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tripData.origin, tripData.travelMode]);
 
   const nextStep = async () => {
     if (step === 3) {
@@ -315,6 +358,24 @@ export default function PlanPage() {
                     placeholder="New York City, NY"
                     className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   />
+                  {distanceLoading && (
+                    <p className="text-xs text-blue-600 mt-1">Looking up distance...</p>
+                  )}
+                  {distanceInfo && (
+                    <p className="text-xs text-green-600 mt-1">{distanceInfo}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">One-way distance (miles)</label>
+                  <input
+                    type="number"
+                    value={tripData.oneWayDistance || ''}
+                    onChange={(e) => setTripData({ ...tripData, oneWayDistance: parseFloat(e.target.value) || 0 })}
+                    placeholder="Auto-filled from origin"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Auto-filled when you enter an origin, or enter manually.</p>
                 </div>
 
                 <div>

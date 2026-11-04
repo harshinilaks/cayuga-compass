@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import emissions, personas, attractions, itineraries, alternatives, agent
+from app.api import emissions, personas, attractions, itineraries, alternatives, agent, distance
 
 app = FastAPI(
     title="STAMP API",
@@ -22,6 +22,7 @@ app.include_router(attractions.router, prefix="/api/attractions", tags=["attract
 app.include_router(itineraries.router, prefix="/api/itineraries", tags=["itineraries"])
 app.include_router(alternatives.router, prefix="/api/alternatives", tags=["alternatives"])
 app.include_router(agent.router, prefix="/api/agent", tags=["agent"])
+app.include_router(distance.router, prefix="/api/distance", tags=["distance"])
 
 
 @app.get("/api/health")
