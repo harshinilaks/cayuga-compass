@@ -1,0 +1,151 @@
+{
+  "personas": [
+    {
+      "id": "regional_weekend_visitor",
+      "name": "Regional Weekend Visitor",
+      "description": "New York State / regional visitors for festivals, events, and weekend getaways",
+      "origin": "NYC + upstate NY (weighted avg)",
+      "party_size": 2,
+      "nights": 1,
+      "days": 2,
+      "arrival": {
+        "mode": "transport_passenger_car_gasoline",
+        "one_way_distance_miles": 105,
+        "round_trip": true,
+        "vehicles": 1
+      },
+      "local_mobility": {
+        "driving_miles": 30,
+        "vehicle_type": "transport_passenger_car_gasoline",
+        "transit_passenger_miles_per_person": 0
+      },
+      "lodging": {
+        "type": "lodging_hotel_us_average",
+        "rooms": 1
+      },
+      "food": {
+        "type": "food_full_service",
+        "spending_per_person_per_day": 50
+      },
+      "activities": [
+        {
+          "category": "activity_festivals_events",
+          "spending_whole_party": 50
+        },
+        {
+          "category": "activity_shopping",
+          "spending_whole_party": 30
+        }
+      ],
+      "expected_results": {
+        "arrival_kg_co2e": 62.7,
+        "local_mobility_kg_co2e": 9.0,
+        "lodging_kg_co2e": 16.1,
+        "food_kg_co2e": 38.8,
+        "activities_kg_co2e": 8.0,
+        "total_kg_co2e": 134.5,
+        "per_person_kg_co2e": 67.3,
+        "per_person_per_day_kg_co2e": 33.6
+      },
+      "sustainability_opportunity": "Expand intercity transit and connections to local attractions"
+    },
+    {
+      "id": "leisure_traveler",
+      "name": "Experience-Seeking Leisure Traveler",
+      "description": "Out-of-region / international visitors for nature, recreation, wineries, food, and culture",
+      "origin": "Dallas (out-of-state metro, flies in)",
+      "party_size": 2,
+      "nights": 2,
+      "days": 3,
+      "arrival": {
+        "mode": "transport_air_medium_haul",
+        "one_way_distance_miles": 1300,
+        "round_trip": true,
+        "vehicles": 0
+      },
+      "local_mobility": {
+        "driving_miles": 80,
+        "vehicle_type": "transport_passenger_car_gasoline",
+        "transit_passenger_miles_per_person": 0
+      },
+      "lodging": {
+        "type": "lodging_hotel_us_average",
+        "rooms": 1
+      },
+      "food": {
+        "type": "food_full_service",
+        "spending_per_person_per_day": 80
+      },
+      "activities": [
+        {
+          "category": "activity_wineries",
+          "spending_whole_party": 120
+        },
+        {
+          "category": "activity_outdoor_recreation",
+          "spending_whole_party": 75
+        }
+      ],
+      "expected_results": {
+        "arrival_kg_co2e": 676.5,
+        "local_mobility_kg_co2e": 23.9,
+        "lodging_kg_co2e": 32.2,
+        "food_kg_co2e": 93.1,
+        "activities_kg_co2e": 39.5,
+        "total_kg_co2e": 865.2,
+        "per_person_kg_co2e": 432.6,
+        "per_person_per_day_kg_co2e": 144.2
+      },
+      "sustainability_opportunity": "Develop car-free itineraries, shuttles, and cycling connections"
+    },
+    {
+      "id": "university_visitor",
+      "name": "University-Connected Visitor",
+      "description": "Domestic / international visitors for campus visits, conferences, family, and sporting events",
+      "origin": "Northeast (e.g. NJ / eastern PA)",
+      "party_size": 2,
+      "nights": 2,
+      "days": 3,
+      "arrival": {
+        "mode": "transport_passenger_car_gasoline",
+        "one_way_distance_miles": 250,
+        "round_trip": true,
+        "vehicles": 1
+      },
+      "local_mobility": {
+        "driving_miles": 40,
+        "vehicle_type": "transport_passenger_car_gasoline",
+        "transit_passenger_miles_per_person": 5
+      },
+      "lodging": {
+        "type": "lodging_hotel_us_average",
+        "rooms": 1
+      },
+      "food": {
+        "type": "food_full_service",
+        "spending_per_person_per_day": 50
+      },
+      "activities": [
+        {
+          "category": "activity_shopping",
+          "spending_whole_party": 60
+        },
+        {
+          "category": "activity_festivals_events",
+          "spending_whole_party": 60
+        }
+      ],
+      "expected_results": {
+        "arrival_kg_co2e": 149.3,
+        "local_mobility_kg_co2e": 12.6,
+        "lodging_kg_co2e": 32.2,
+        "food_kg_co2e": 58.2,
+        "activities_kg_co2e": 12.2,
+        "total_kg_co2e": 264.6,
+        "per_person_kg_co2e": 132.3,
+        "per_person_per_day_kg_co2e": 44.1
+      },
+      "sustainability_opportunity": "Improve TCAT access between campuses, hotels, and downtown"
+    }
+  ]
+}
