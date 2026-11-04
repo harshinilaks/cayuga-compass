@@ -42,7 +42,18 @@ export default function PlanPage() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<{
+    arrival: number;
+    local_mobility: number;
+    lodging: number;
+    food: number;
+    activities: number;
+    total: number;
+    per_person: number;
+    per_person_per_day: number;
+    missing_factors: string[];
+    unverified_factors: string[];
+  } | null>(null);
 
   const transportationModes = [
     { id: 'air_short', label: 'Plane (short haul)', icon: '✈️' },
@@ -309,7 +320,7 @@ export default function PlanPage() {
 
                 <div className="mt-8 p-5 bg-green-50 rounded-xl border border-green-200">
                   <p className="text-green-800 font-medium">
-                    💡 A quick note: Travel is often the largest source of visitor-trip emissions.
+                    💡 A quick note: Travel is often the largest source of visitor&apos;s trip emissions.
                   </p>
                 </div>
               </div>

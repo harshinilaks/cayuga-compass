@@ -24,7 +24,7 @@ export default function Home() {
             Explore Ithaca Sustainably
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 mb-10 leading-relaxed">
-            Discover your trip's carbon footprint, explore local attractions, and plan a more sustainable visit to Tompkins County.
+            Discover your trip&apos;s carbon footprint, explore local attractions, and plan a more sustainable visit to Tompkins County.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
@@ -50,7 +50,7 @@ export default function Home() {
             <div className="text-3xl mb-4">🌍</div>
             <h3 className="text-xl font-bold text-gray-900 mb-3">Understand Your Impact</h3>
             <p className="text-gray-600 leading-relaxed">
-              Calculate your trip's carbon footprint with our research-based emissions calculator. See breakdowns by transportation, lodging, food, and activities.
+              Calculate your trip&apos;s carbon footprint with our research-based emissions calculator. See breakdowns by transportation, lodging, food, and activities.
             </p>
           </div>
 
