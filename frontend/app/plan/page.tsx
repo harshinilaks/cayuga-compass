@@ -25,7 +25,7 @@ export default function PlanPage() {
   const [step, setStep] = useState(1);
   const [tripData, setTripData] = useState<TripData>({
     travelMode: 'car',
-    origin: '',
+    origin: 'New York City, NY',
     partySize: 2,
     tripType: 'round',
     oneWayDistance: 0,
@@ -56,9 +56,9 @@ export default function PlanPage() {
   } | null>(null);
 
   const transportationModes = [
-    { id: 'air_short', label: 'Plane', icon: '✈️' },
-    { id: 'air_medium', label: 'Plane', icon: '✈️' },
-    { id: 'air_long', label: 'Plane', icon: '✈️' },
+    { id: 'air_short', label: 'Plane', icon: '✈' },
+    { id: 'air_medium', label: 'Plane', icon: '✈' },
+    { id: 'air_long', label: 'Plane', icon: '✈' },
     { id: 'car', label: 'Car', icon: '▰' },
     { id: 'suv', label: 'SUV / Van', icon: '▤' },
     { id: 'ev', label: 'Electric Vehicle', icon: '⚡' },
@@ -192,61 +192,56 @@ export default function PlanPage() {
       <nav className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="text-green-700 font-bold text-lg">Tourism Program</div>
-            </div>
             <div className="flex items-center space-x-8 text-sm">
               <Link href="/" className="text-gray-600 hover:text-gray-900">Explore</Link>
               <Link href="/plan" className="text-gray-900 font-medium">Plan your trip</Link>
               <Link href="/methodology" className="text-gray-600 hover:text-gray-900">Sustainability</Link>
-              <Link href="/plan" className="bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">
-                Plan a visit →
-              </Link>
             </div>
+            <Link href="/plan" className="bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">
+              Plan a visit →
+            </Link>
           </div>
         </div>
       </nav>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Step Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                {[1, 2, 3, 4].map((s) => (
-                  <div key={s} className="flex items-center">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                        s === step ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-600'
-                      }`}
-                    >
-                      {s}
-                    </div>
-                    {s < 4 && <div className="w-8 h-0.5 bg-gray-200" />}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+              {[1, 2, 3, 4].map((s) => (
+                <div key={s} className="flex items-center">
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
+                      s === step ? 'bg-green-700 text-white' : 'bg-gray-200 text-gray-600'
+                    }`}
+                  >
+                    {s}
                   </div>
-                ))}
-              </div>
-              <div className="text-sm text-gray-500">
-                STEP {step} OF 4
-              </div>
+                  {s < 4 && <div className="w-6 h-0.5 bg-gray-200" />}
+                </div>
+              ))}
+            </div>
+            <div className="text-xs text-gray-500">
+              STEP {step} OF 4
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">{getStepTitle()}</h1>
-          <p className="text-gray-600">{getStepSubtitle()}</p>
+          <h1 className="text-xl font-bold text-gray-900 mb-1">{getStepTitle()}</h1>
+          <p className="text-sm text-gray-600">{getStepSubtitle()}</p>
         </div>
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             {step === 1 && (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Travel mode</label>
-                  <p className="text-xs text-gray-500 mb-3">Choose the main way you&apos;ll arrive.</p>
+                  <p className="text-xs text-gray-500 mb-2">Choose the main way you&apos;ll arrive.</p>
                   <select
                     value={tripData.travelMode}
                     onChange={(e) => setTripData({ ...tripData, travelMode: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   >
                     {transportationModes.map((mode) => (
                       <option key={mode.id} value={mode.id}>
@@ -263,23 +258,23 @@ export default function PlanPage() {
                     value={tripData.origin}
                     onChange={(e) => setTripData({ ...tripData, origin: e.target.value })}
                     placeholder="New York City, NY"
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Number of travelers</label>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, partySize: Math.max(1, tripData.partySize - 1) })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
-                    <span className="text-lg font-medium w-8 text-center">{tripData.partySize}</span>
+                    <span className="text-base font-medium w-6 text-center">{tripData.partySize}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, partySize: tripData.partySize + 1 })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -288,7 +283,7 @@ export default function PlanPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Trip type</label>
-                  <div className="flex space-x-6">
+                  <div className="flex space-x-4">
                     <label className="flex items-center">
                       <input
                         type="radio"
@@ -312,10 +307,10 @@ export default function PlanPage() {
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-2">
                   <button
                     onClick={nextStep}
-                    className="bg-green-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-800 transition"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm"
                   >
                     Next: Your stay →
                   </button>
@@ -324,14 +319,14 @@ export default function PlanPage() {
             )}
 
             {step === 2 && (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Your accommodation</label>
-                  <p className="text-xs text-gray-500 mb-3">Select the type that best describes your stay.</p>
+                  <p className="text-xs text-gray-500 mb-2">Select the type that best describes your stay.</p>
                   <select
                     value={tripData.accommodationType}
                     onChange={(e) => setTripData({ ...tripData, accommodationType: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   >
                     {accommodationTypes.map((type) => (
                       <option key={type.id} value={type.id}>
@@ -343,17 +338,17 @@ export default function PlanPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Number of nights</label>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, nights: Math.max(0, tripData.nights - 1) })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
-                    <span className="text-lg font-medium w-8 text-center">{tripData.nights}</span>
+                    <span className="text-base font-medium w-6 text-center">{tripData.nights}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, nights: tripData.nights + 1 })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -362,27 +357,27 @@ export default function PlanPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Number of rooms</label>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, rooms: Math.max(1, tripData.rooms - 1) })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
-                    <span className="text-lg font-medium w-8 text-center">{tripData.rooms}</span>
+                    <span className="text-base font-medium w-6 text-center">{tripData.rooms}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, rooms: tripData.rooms + 1 })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-2">
                   <button
                     onClick={nextStep}
-                    className="bg-green-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-800 transition"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm"
                   >
                     Next: Activities →
                   </button>
@@ -391,14 +386,14 @@ export default function PlanPage() {
             )}
 
             {step === 3 && (
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Local transportation</label>
-                  <p className="text-xs text-gray-500 mb-3">Choose your main way of getting around.</p>
+                  <p className="text-xs text-gray-500 mb-2">Choose your main way of getting around.</p>
                   <select
                     value={tripData.localTransport}
                     onChange={(e) => setTripData({ ...tripData, localTransport: e.target.value })}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   >
                     {localTransportOptions.map((option) => (
                       <option key={option.id} value={option.id}>
@@ -410,17 +405,17 @@ export default function PlanPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Days using this transport</label>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, localTransportDays: Math.max(1, tripData.localTransportDays - 1) })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
-                    <span className="text-lg font-medium w-8 text-center">{tripData.localTransportDays}</span>
+                    <span className="text-base font-medium w-6 text-center">{tripData.localTransportDays}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, localTransportDays: tripData.localTransportDays + 1 })}
-                      className="w-8 h-8 bg-gray-100 rounded hover:bg-gray-200 transition text-lg"
+                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -429,9 +424,9 @@ export default function PlanPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">Activities planned · Select all that apply</label>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     {activityOptions.map((activity) => (
-                      <label key={activity.id} className="flex items-center p-3 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer">
+                      <label key={activity.id} className="flex items-center p-2.5 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer text-sm">
                         <input
                           type="checkbox"
                           checked={tripData.activities.includes(activity.id)}
@@ -442,7 +437,7 @@ export default function PlanPage() {
                               setTripData({ ...tripData, activities: tripData.activities.filter((a) => a !== activity.id) });
                             }
                           }}
-                          className="mr-3"
+                          className="mr-2"
                         />
                         {activity.label}
                       </label>
@@ -450,11 +445,11 @@ export default function PlanPage() {
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-2">
                   <button
                     onClick={nextStep}
                     disabled={loading}
-                    className="bg-green-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-800 transition disabled:opacity-50"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm disabled:opacity-50"
                   >
                     {loading ? 'Calculating...' : 'See my results →'}
                   </button>
@@ -463,32 +458,32 @@ export default function PlanPage() {
             )}
 
             {step === 4 && results && (
-              <div className="space-y-6">
-                <div className="text-center py-8">
-                  <div className="text-5xl font-bold text-gray-900 mb-2">
+              <div className="space-y-5">
+                <div className="text-center py-6">
+                  <div className="text-4xl font-bold text-gray-900 mb-1">
                     {results.total.toFixed(0)}
                   </div>
-                  <div className="text-gray-600">kg CO₂e</div>
-                  <div className="text-sm text-gray-500 mt-2">
+                  <div className="text-gray-600 text-sm">kg CO₂e</div>
+                  <div className="text-xs text-gray-500 mt-1">
                     Estimated trip total
                   </div>
-                  <div className="text-lg text-gray-700 mt-1">
+                  <div className="text-base text-gray-700 mt-1">
                     {results.per_person.toFixed(0)} kg CO₂e per traveler
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">FOOTPRINT BREAKDOWN</h3>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
+                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">FOOTPRINT BREAKDOWN</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-700">Transportation</span>
                       <span className="font-medium text-gray-900">{results.arrival.toFixed(0)} kg</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-700">Accommodation</span>
                       <span className="font-medium text-gray-900">{results.lodging.toFixed(0)} kg</span>
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center text-sm">
                       <span className="text-gray-700">Activities & local</span>
                       <span className="font-medium text-gray-900">{(results.local_mobility + results.food + results.activities).toFixed(0)} kg</span>
                     </div>
@@ -496,27 +491,27 @@ export default function PlanPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Ways to travel lighter</h3>
-                  <div className="space-y-3">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 font-medium">Take the bus</p>
-                      <p className="text-sm text-gray-600">Compare TCAT routes for getting around.</p>
+                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">Ways to travel lighter</h3>
+                  <div className="space-y-2">
+                    <div className="p-3 bg-gray-50 rounded">
+                      <p className="text-gray-700 font-medium text-sm">Take the bus</p>
+                      <p className="text-xs text-gray-600">Compare TCAT routes for getting around.</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 font-medium">Choose a thoughtful stay</p>
-                      <p className="text-sm text-gray-600">Look for local, efficient accommodations.</p>
+                    <div className="p-3 bg-gray-50 rounded">
+                      <p className="text-gray-700 font-medium text-sm">Choose a thoughtful stay</p>
+                      <p className="text-xs text-gray-600">Look for local, efficient accommodations.</p>
                     </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 font-medium">Eat local & plant-forward</p>
-                      <p className="text-sm text-gray-600">Support local food and lower-impact meals.</p>
+                    <div className="p-3 bg-gray-50 rounded">
+                      <p className="text-gray-700 font-medium text-sm">Eat local & plant-forward</p>
+                      <p className="text-xs text-gray-600">Support local food and lower-impact meals.</p>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4">
+                <div className="pt-2">
                   <button
                     onClick={() => setStep(1)}
-                    className="bg-green-700 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-800 transition"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm"
                   >
                     Plan a greener trip →
                   </button>
@@ -526,8 +521,8 @@ export default function PlanPage() {
 
             {/* Note */}
             {step < 4 && (
-              <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">
+              <div className="mt-6 p-3 bg-gray-50 rounded">
+                <p className="text-xs text-gray-600">
                   <strong>{getNoteLabel()}:</strong> {getStepNote()}
                 </p>
               </div>
@@ -536,58 +531,58 @@ export default function PlanPage() {
 
           {/* Trip Summary Panel */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-50 rounded-lg p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Your trip so far</h3>
-              <div className="text-center mb-6">
-                <div className="text-4xl font-bold text-gray-900">
+            <div className="bg-gray-50 rounded p-5">
+              <h3 className="font-semibold text-gray-900 mb-4 text-sm">Your trip so far</h3>
+              <div className="text-center mb-4">
+                <div className="text-3xl font-bold text-gray-900">
                   {results ? results.total.toFixed(0) : '—'}
                 </div>
-                <div className="text-sm text-gray-500">kg CO₂e*</div>
+                <div className="text-xs text-gray-500">kg CO₂e*</div>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Transportation</span>
                     <span className="font-medium text-gray-900">
                       {results ? `${results.arrival.toFixed(0)} kg` : 'Not added'}
                     </span>
                   </div>
                   {results && results.arrival > 0 && (
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div
-                        className="bg-green-600 h-2 rounded-full"
+                        className="bg-green-600 h-1.5 rounded-full"
                         style={{ width: `${Math.min((results.arrival / results.total) * 100, 100)}%` }}
                       />
                     </div>
                   )}
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Stay</span>
                     <span className="font-medium text-gray-900">
                       {results ? `${results.lodging.toFixed(0)} kg` : 'Not added'}
                     </span>
                   </div>
                   {results && results.lodging > 0 && (
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div
-                        className="bg-green-600 h-2 rounded-full"
+                        className="bg-green-600 h-1.5 rounded-full"
                         style={{ width: `${Math.min((results.lodging / results.total) * 100, 100)}%` }}
                       />
                     </div>
                   )}
                 </div>
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Activities</span>
                     <span className="font-medium text-gray-900">
                       {results ? `${(results.local_mobility + results.food + results.activities).toFixed(0)} kg` : 'Not added'}
                     </span>
                   </div>
                   {results && (results.local_mobility + results.food + results.activities) > 0 && (
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div
-                        className="bg-green-600 h-2 rounded-full"
+                        className="bg-green-600 h-1.5 rounded-full"
                         style={{ width: `${Math.min(((results.local_mobility + results.food + results.activities) / results.total) * 100, 100)}%` }}
                       />
                     </div>
