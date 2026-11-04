@@ -187,9 +187,9 @@ export default function PlanPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Navigation */}
-      <nav className="border-b border-gray-200">
+      <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-8 text-sm">
@@ -232,7 +232,7 @@ export default function PlanPage() {
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 bg-white rounded-lg p-6">
             {step === 1 && (
               <div className="space-y-5">
                 <div>
@@ -241,7 +241,7 @@ export default function PlanPage() {
                   <select
                     value={tripData.travelMode}
                     onChange={(e) => setTripData({ ...tripData, travelMode: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   >
                     {transportationModes.map((mode) => (
                       <option key={mode.id} value={mode.id}>
@@ -258,7 +258,7 @@ export default function PlanPage() {
                     value={tripData.origin}
                     onChange={(e) => setTripData({ ...tripData, origin: e.target.value })}
                     placeholder="New York City, NY"
-                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   />
                 </div>
 
@@ -267,14 +267,14 @@ export default function PlanPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, partySize: Math.max(1, tripData.partySize - 1) })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
                     <span className="text-base font-medium w-6 text-center">{tripData.partySize}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, partySize: tripData.partySize + 1 })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -310,7 +310,7 @@ export default function PlanPage() {
                 <div className="pt-2">
                   <button
                     onClick={nextStep}
-                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-800 transition text-sm"
                   >
                     Next: Your stay →
                   </button>
@@ -326,7 +326,7 @@ export default function PlanPage() {
                   <select
                     value={tripData.accommodationType}
                     onChange={(e) => setTripData({ ...tripData, accommodationType: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   >
                     {accommodationTypes.map((type) => (
                       <option key={type.id} value={type.id}>
@@ -341,14 +341,14 @@ export default function PlanPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, nights: Math.max(0, tripData.nights - 1) })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
                     <span className="text-base font-medium w-6 text-center">{tripData.nights}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, nights: tripData.nights + 1 })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -360,14 +360,14 @@ export default function PlanPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, rooms: Math.max(1, tripData.rooms - 1) })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
                     <span className="text-base font-medium w-6 text-center">{tripData.rooms}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, rooms: tripData.rooms + 1 })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -377,7 +377,7 @@ export default function PlanPage() {
                 <div className="pt-2">
                   <button
                     onClick={nextStep}
-                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-800 transition text-sm"
                   >
                     Next: Activities →
                   </button>
@@ -393,7 +393,7 @@ export default function PlanPage() {
                   <select
                     value={tripData.localTransport}
                     onChange={(e) => setTripData({ ...tripData, localTransport: e.target.value })}
-                    className="w-full p-2.5 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   >
                     {localTransportOptions.map((option) => (
                       <option key={option.id} value={option.id}>
@@ -408,14 +408,14 @@ export default function PlanPage() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setTripData({ ...tripData, localTransportDays: Math.max(1, tripData.localTransportDays - 1) })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       −
                     </button>
                     <span className="text-base font-medium w-6 text-center">{tripData.localTransportDays}</span>
                     <button
                       onClick={() => setTripData({ ...tripData, localTransportDays: tripData.localTransportDays + 1 })}
-                      className="w-7 h-7 bg-gray-100 rounded hover:bg-gray-200 transition text-sm"
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
                     >
                       +
                     </button>
@@ -426,7 +426,7 @@ export default function PlanPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-3">Activities planned · Select all that apply</label>
                   <div className="grid grid-cols-2 gap-2">
                     {activityOptions.map((activity) => (
-                      <label key={activity.id} className="flex items-center p-2.5 border border-gray-200 rounded hover:bg-gray-50 cursor-pointer text-sm">
+                      <label key={activity.id} className="flex items-center p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
                         <input
                           type="checkbox"
                           checked={tripData.activities.includes(activity.id)}
@@ -449,7 +449,7 @@ export default function PlanPage() {
                   <button
                     onClick={nextStep}
                     disabled={loading}
-                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm disabled:opacity-50"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-800 transition text-sm disabled:opacity-50"
                   >
                     {loading ? 'Calculating...' : 'See my results →'}
                   </button>
@@ -493,15 +493,15 @@ export default function PlanPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3 text-sm">Ways to travel lighter</h3>
                   <div className="space-y-2">
-                    <div className="p-3 bg-gray-50 rounded">
+                    <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-gray-700 font-medium text-sm">Take the bus</p>
                       <p className="text-xs text-gray-600">Compare TCAT routes for getting around.</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded">
+                    <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-gray-700 font-medium text-sm">Choose a thoughtful stay</p>
                       <p className="text-xs text-gray-600">Look for local, efficient accommodations.</p>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded">
+                    <div className="p-3 bg-gray-50 rounded-lg">
                       <p className="text-gray-700 font-medium text-sm">Eat local & plant-forward</p>
                       <p className="text-xs text-gray-600">Support local food and lower-impact meals.</p>
                     </div>
@@ -511,7 +511,7 @@ export default function PlanPage() {
                 <div className="pt-2">
                   <button
                     onClick={() => setStep(1)}
-                    className="bg-green-700 text-white px-5 py-2.5 rounded font-medium hover:bg-green-800 transition text-sm"
+                    className="bg-green-700 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-green-800 transition text-sm"
                   >
                     Plan a greener trip →
                   </button>
@@ -521,7 +521,7 @@ export default function PlanPage() {
 
             {/* Note */}
             {step < 4 && (
-              <div className="mt-6 p-3 bg-gray-50 rounded">
+              <div className="mt-6 p-3 bg-gray-50 rounded-lg">
                 <p className="text-xs text-gray-600">
                   <strong>{getNoteLabel()}:</strong> {getStepNote()}
                 </p>
@@ -531,7 +531,7 @@ export default function PlanPage() {
 
           {/* Trip Summary Panel */}
           <div className="lg:col-span-1">
-            <div className="bg-gray-50 rounded p-5">
+            <div className="bg-white rounded-lg p-5">
               <h3 className="font-semibold text-gray-900 mb-4 text-sm">Your trip so far</h3>
               <div className="text-center mb-4">
                 <div className="text-3xl font-bold text-gray-900">
