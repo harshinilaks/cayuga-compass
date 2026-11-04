@@ -54,6 +54,12 @@ export default function PlanPage() {
     missing_factors: string[];
     unverified_factors: string[];
   } | null>(null);
+  const [partialResults, setPartialResults] = useState<{
+    arrival: number;
+    lodging: number;
+    activities_total: number;
+    total: number;
+  }>({ arrival: 0, lodging: 0, activities_total: 0, total: 0 });
 
   const transportationModes = [
     { id: 'air_short', label: 'Plane', icon: '✈' },
@@ -93,39 +99,60 @@ export default function PlanPage() {
     { id: 'events', label: 'Events' },
   ];
 
+  const buildInputs = () => ({
+    arrival_mode: tripData.travelMode === 'car' ? 'transport_passenger_car_gasoline' :
+                  tripData.travelMode === 'suv' ? 'transport_suv_pickup_van' :
+                  tripData.travelMode === 'ev' ? 'transport_electric_vehicle' :
+                  tripData.travelMode === 'train' ? 'transport_intercity_rail' :
+                  tripData.travelMode === 'bus' ? 'transport_intercity_bus' :
+                  tripData.travelMode === 'rideshare' ? 'transport_passenger_car_gasoline' :
+                  tripData.travelMode === 'air_short' ? 'transport_air_short_haul' :
+                  tripData.travelMode === 'air_medium' ? 'transport_air_medium_haul' :
+                  'transport_air_long_haul',
+    one_way_distance_miles: tripData.oneWayDistance,
+    round_trip: tripData.tripType === 'round',
+    vehicles: tripData.vehicles,
+    party_size: tripData.partySize,
+    local_driving_miles: tripData.localDrivingMiles,
+    local_vehicle_type: 'transport_passenger_car_gasoline',
+    transit_passenger_miles_per_person: tripData.transitMilesPerPerson,
+    lodging_type: tripData.accommodationType === 'hotel' ? 'lodging_hotel_us_average' :
+                 tripData.accommodationType === 'family' ? 'lodging_friends_family' :
+                 'lodging_hotel_us_average',
+    nights: tripData.nights,
+    rooms: tripData.rooms,
+    food_type: 'food_full_service',
+    food_spending_per_person_per_day: 50,
+    days: tripData.days,
+    activities: [],
+  });
+
+  const calculatePartial = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/api/emissions/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildInputs()),
+      });
+      const data = await response.json();
+      setPartialResults({
+        arrival: data.arrival,
+        lodging: data.lodging,
+        activities_total: data.local_mobility + data.food + data.activities,
+        total: data.total,
+      });
+    } catch (error) {
+      console.error('Partial calculation error:', error);
+    }
+  };
+
   const calculateFootprint = async () => {
     setLoading(true);
     try {
       const response = await fetch('http://localhost:8000/api/emissions/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          arrival_mode: tripData.travelMode === 'car' ? 'transport_passenger_car_gasoline' :
-                        tripData.travelMode === 'suv' ? 'transport_suv_pickup_van' :
-                        tripData.travelMode === 'ev' ? 'transport_electric_vehicle' :
-                        tripData.travelMode === 'train' ? 'transport_intercity_rail' :
-                        tripData.travelMode === 'bus' ? 'transport_intercity_bus' :
-                        tripData.travelMode === 'rideshare' ? 'transport_passenger_car_gasoline' :
-                        tripData.travelMode === 'air_short' ? 'transport_air_short_haul' :
-                        tripData.travelMode === 'air_medium' ? 'transport_air_medium_haul' :
-                        'transport_air_long_haul',
-          one_way_distance_miles: tripData.oneWayDistance,
-          round_trip: tripData.tripType === 'round',
-          vehicles: tripData.vehicles,
-          party_size: tripData.partySize,
-          local_driving_miles: tripData.localDrivingMiles,
-          local_vehicle_type: 'transport_passenger_car_gasoline',
-          transit_passenger_miles_per_person: tripData.transitMilesPerPerson,
-          lodging_type: tripData.accommodationType === 'hotel' ? 'lodging_hotel_us_average' :
-                       tripData.accommodationType === 'family' ? 'lodging_friends_family' :
-                       'lodging_hotel_us_average',
-          nights: tripData.nights,
-          rooms: tripData.rooms,
-          food_type: 'food_full_service',
-          food_spending_per_person_per_day: 50,
-          days: tripData.days,
-          activities: [],
-        }),
+        body: JSON.stringify(buildInputs()),
       });
       const data = await response.json();
       setResults(data);
@@ -138,10 +165,11 @@ export default function PlanPage() {
     }
   };
 
-  const nextStep = () => {
+  const nextStep = async () => {
     if (step === 3) {
       calculateFootprint();
     } else {
+      await calculatePartial();
       setStep(step + 1);
     }
   };
@@ -535,7 +563,11 @@ export default function PlanPage() {
               <h3 className="font-semibold text-gray-900 mb-4 text-sm">Your trip so far</h3>
               <div className="text-center mb-4">
                 <div className="text-3xl font-bold text-gray-900">
-                  {results ? results.total.toFixed(0) : '—'}
+                  {results
+                    ? results.total.toFixed(0)
+                    : partialResults.total > 0
+                    ? partialResults.total.toFixed(0)
+                    : '—'}
                 </div>
                 <div className="text-xs text-gray-500">kg CO₂e*</div>
               </div>
@@ -544,49 +576,85 @@ export default function PlanPage() {
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Transportation</span>
                     <span className="font-medium text-gray-900">
-                      {results ? `${results.arrival.toFixed(0)} kg` : 'Not added'}
+                      {results
+                        ? `${results.arrival.toFixed(0)} kg`
+                        : partialResults.arrival > 0
+                        ? `${partialResults.arrival.toFixed(0)} kg`
+                        : 'Not added'}
                     </span>
                   </div>
-                  {results && results.arrival > 0 && (
+                  {(results && results.arrival > 0) || partialResults.arrival > 0 ? (
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div
                         className="bg-green-600 h-1.5 rounded-full"
-                        style={{ width: `${Math.min((results.arrival / results.total) * 100, 100)}%` }}
+                        style={{
+                          width: `${Math.min(
+                            ((results ? results.arrival : partialResults.arrival) /
+                              (results ? results.total : partialResults.total || 1)) *
+                              100,
+                            100
+                          )}%`,
+                        }}
                       />
                     </div>
-                  )}
+                  ) : null}
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Stay</span>
                     <span className="font-medium text-gray-900">
-                      {results ? `${results.lodging.toFixed(0)} kg` : 'Not added'}
+                      {results
+                        ? `${results.lodging.toFixed(0)} kg`
+                        : partialResults.lodging > 0
+                        ? `${partialResults.lodging.toFixed(0)} kg`
+                        : 'Not added'}
                     </span>
                   </div>
-                  {results && results.lodging > 0 && (
+                  {(results && results.lodging > 0) || partialResults.lodging > 0 ? (
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div
                         className="bg-green-600 h-1.5 rounded-full"
-                        style={{ width: `${Math.min((results.lodging / results.total) * 100, 100)}%` }}
+                        style={{
+                          width: `${Math.min(
+                            ((results ? results.lodging : partialResults.lodging) /
+                              (results ? results.total : partialResults.total || 1)) *
+                              100,
+                            100
+                          )}%`,
+                        }}
                       />
                     </div>
-                  )}
+                  ) : null}
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
                     <span className="text-gray-600">Activities</span>
                     <span className="font-medium text-gray-900">
-                      {results ? `${(results.local_mobility + results.food + results.activities).toFixed(0)} kg` : 'Not added'}
+                      {results
+                        ? `${(results.local_mobility + results.food + results.activities).toFixed(0)} kg`
+                        : partialResults.activities_total > 0
+                        ? `${partialResults.activities_total.toFixed(0)} kg`
+                        : 'Not added'}
                     </span>
                   </div>
-                  {results && (results.local_mobility + results.food + results.activities) > 0 && (
+                  {(results && results.local_mobility + results.food + results.activities > 0) ||
+                  partialResults.activities_total > 0 ? (
                     <div className="w-full bg-gray-200 rounded-full h-1.5">
                       <div
                         className="bg-green-600 h-1.5 rounded-full"
-                        style={{ width: `${Math.min(((results.local_mobility + results.food + results.activities) / results.total) * 100, 100)}%` }}
+                        style={{
+                          width: `${Math.min(
+                            ((results
+                              ? results.local_mobility + results.food + results.activities
+                              : partialResults.activities_total) /
+                              (results ? results.total : partialResults.total || 1)) *
+                              100,
+                            100
+                          )}%`,
+                        }}
                       />
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>
