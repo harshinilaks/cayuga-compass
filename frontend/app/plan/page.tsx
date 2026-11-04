@@ -64,9 +64,7 @@ export default function PlanPage() {
   const [distanceInfo, setDistanceInfo] = useState<string | null>(null);
 
   const transportationModes = [
-    { id: 'air_short', label: 'Plane', icon: '✈' },
-    { id: 'air_medium', label: 'Plane', icon: '✈' },
-    { id: 'air_long', label: 'Plane', icon: '✈' },
+    { id: 'air', label: 'Plane', icon: '✈' },
     { id: 'car', label: 'Car', icon: '▰' },
     { id: 'suv', label: 'SUV / Van', icon: '▤' },
     { id: 'ev', label: 'Electric Vehicle', icon: '⚡' },
@@ -101,16 +99,23 @@ export default function PlanPage() {
     { id: 'events', label: 'Events' },
   ];
 
+  const getArrivalMode = () => {
+    if (tripData.travelMode === 'air') {
+      if (tripData.oneWayDistance < 300) return 'transport_air_short_haul';
+      if (tripData.oneWayDistance <= 2300) return 'transport_air_medium_haul';
+      return 'transport_air_long_haul';
+    }
+    if (tripData.travelMode === 'car') return 'transport_passenger_car_gasoline';
+    if (tripData.travelMode === 'suv') return 'transport_suv_pickup_van';
+    if (tripData.travelMode === 'ev') return 'transport_electric_vehicle';
+    if (tripData.travelMode === 'train') return 'transport_intercity_rail';
+    if (tripData.travelMode === 'bus') return 'transport_intercity_bus';
+    if (tripData.travelMode === 'rideshare') return 'transport_passenger_car_gasoline';
+    return 'transport_passenger_car_gasoline';
+  };
+
   const buildInputs = () => ({
-    arrival_mode: tripData.travelMode === 'car' ? 'transport_passenger_car_gasoline' :
-                  tripData.travelMode === 'suv' ? 'transport_suv_pickup_van' :
-                  tripData.travelMode === 'ev' ? 'transport_electric_vehicle' :
-                  tripData.travelMode === 'train' ? 'transport_intercity_rail' :
-                  tripData.travelMode === 'bus' ? 'transport_intercity_bus' :
-                  tripData.travelMode === 'rideshare' ? 'transport_passenger_car_gasoline' :
-                  tripData.travelMode === 'air_short' ? 'transport_air_short_haul' :
-                  tripData.travelMode === 'air_medium' ? 'transport_air_medium_haul' :
-                  'transport_air_long_haul',
+    arrival_mode: getArrivalMode(),
     one_way_distance_miles: tripData.oneWayDistance,
     round_trip: tripData.tripType === 'round',
     vehicles: tripData.vehicles,
@@ -172,7 +177,7 @@ export default function PlanPage() {
     setDistanceLoading(true);
     setDistanceInfo(null);
     try {
-      const isFlight = travelMode.startsWith('air_');
+      const isFlight = travelMode === 'air';
       const mode = isFlight ? 'flying' : 'driving';
       const response = await fetch(
         `http://localhost:8000/api/distance/?origin=${encodeURIComponent(origin)}&mode=${mode}`
@@ -376,6 +381,13 @@ export default function PlanPage() {
                     className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                   />
                   <p className="text-xs text-gray-500 mt-1">Auto-filled when you enter an origin, or enter manually.</p>
+                  {tripData.travelMode === 'air' && tripData.oneWayDistance > 0 && (
+                    <p className="text-xs text-blue-600 mt-1">
+                      {tripData.oneWayDistance < 300 ? 'Short haul (<300 mi)' :
+                       tripData.oneWayDistance <= 2300 ? 'Medium haul (300–2,300 mi)' :
+                       'Long haul (>2,300 mi)'}
+                    </p>
+                  )}
                 </div>
 
                 <div>
