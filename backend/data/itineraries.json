@@ -1,0 +1,59 @@
+{
+  "templates": [
+    {
+      "id": "campus_tour",
+      "name": "Cornell Campus Tour",
+      "description": "Explore Cornell's iconic campus attractions",
+      "duration_days": 1,
+      "interest_tags": ["campus", "architecture", "walking", "education"],
+      "stops": [
+        {"attraction_id": "triphammer_falls", "time": "10:00 AM", "notes": "Scenic waterfall in Fall Creek gorge"},
+        {"attraction_id": "cornell_dairy_bar", "time": "12:30 PM", "notes": "Lunch at the campus ice cream shop"},
+        {"attraction_id": "johnson_museum", "time": "2:00 PM", "notes": "Visit the art museum"},
+        {"attraction_id": "collegetown", "time": "5:30 PM", "notes": "Dinner and evening in Collegetown"}
+      ],
+      "sustainability_tips": [
+        "Walk between campus attractions",
+        "Use TCAT Route 81 for longer distances",
+        "Choose local eateries for lunch"
+      ]
+    },
+    {
+      "id": "summer_ithaca",
+      "name": "Summer Ithaca Experience",
+      "description": "Make the most of a summer day in downtown Ithaca",
+      "duration_days": 1,
+      "interest_tags": ["farmers market", "cider", "waterfall", "dining"],
+      "stops": [
+        {"attraction_id": "farmers_market", "time": "10:00 AM", "notes": "Browse local vendors"},
+        {"attraction_id": "south_hill_cider", "time": "11:00 AM", "notes": "Cider tasting"},
+        {"attraction_id": "moosewood", "time": "1:00 PM", "notes": "Vegetarian lunch"},
+        {"attraction_id": "ithaca_falls", "time": "3:00 PM", "notes": "Waterfall visit"},
+        {"attraction_id": "ithaca_commons", "time": "5:30 PM", "notes": "Downtown dinner"}
+      ],
+      "sustainability_tips": [
+        "Use Cayuga Waterfront Trail for biking or walking",
+        "Choose eco-certified dining options",
+        "Combine stops to minimize driving"
+      ]
+    },
+    {
+      "id": "winter_recreation",
+      "name": "Winter Recreation",
+      "description": "Skiing and winter fun near Ithaca",
+      "duration_days": 1,
+      "interest_tags": ["skiing", "winter", "recreation", "outdoors"],
+      "stops": [
+        {"attraction_id": "greek_peak", "time": "10:00 AM", "notes": "Skiing at Greek Peak"},
+        {"attraction_id": "ithaca_commons", "time": "1:30 PM", "notes": "Lunch downtown"},
+        {"attraction_id": "cayuga_lake", "time": "3:30 PM", "notes": "Cross-country skiing"},
+        {"attraction_id": "ithaca_commons", "time": "6:30 PM", "notes": "Evening at the Commons"}
+      ],
+      "sustainability_tips": [
+        "Carpool to ski resorts",
+        "Look for ski shuttles if available",
+        "Choose local seasonal produce at restaurants"
+      ]
+    }
+  ]
+}

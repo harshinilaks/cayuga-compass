@@ -1,16 +1,136 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
+from typing import List, Dict
+from app.services.agent.agent import StampAgent
+import os
 
 router = APIRouter()
+agent = StampAgent()
+
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
 
 
 class ChatRequest(BaseModel):
     message: str
-    conversation_history: list = []
+    conversation_history: List[ChatMessage] = []
+    trip_data: Dict = {}
 
 
 @router.post("/chat")
-def chat(request: ChatRequest):
-    """AI agent chat endpoint."""
-    # TODO: Implement AI agent
-    return {"response": "AI agent not yet implemented"}
+async def chat(request: ChatRequest):
+    """AI agent chat endpoint - uses OpenAI-compatible provider if key configured, otherwise deterministic fallback."""
+    api_key = os.environ.get("OPENAI_API_KEY")
+
+    if not api_key:
+        # Deterministic fallback - no LLM, just tool calls
+        return {
+            "response": _deterministic_fallback(request.message, request.trip_data),
+            "mode": "deterministic",
+            "note": "AI chat requires OPENAI_API_KEY in .env. This is a deterministic planning assistant."
+        }
+
+    # LLM-powered agent with tool calling
+    return await _llm_chat(request.message, request.conversation_history, request.trip_data)
+
+
+def _deterministic_fallback(message: str, trip_data: Dict) -> str:
+    """Deterministic planning assistant without LLM."""
+    msg_lower = message.lower()
+
+    if "carbon" in msg_lower or "footprint" in msg_lower or "emissions" in msg_lower:
+        if trip_data:
+            result = agent.calculator.calculate_trip_footprint(trip_data)
+            return f"Your estimated trip footprint is {result['total']:.1f} kg CO2e. Breakdown: Arrival {result['arrival']:.1f}kg, Local {result['local_mobility']:.1f}kg, Lodging {result['lodging']:.1f}kg, Food {result['food']:.1f}kg, Activities {result['activities']:.1f}kg."
+        return "I can calculate your carbon footprint. Please provide trip details like transportation, distance, party size, lodging, and activities."
+
+    if "itinerary" in msg_lower or "plan" in msg_lower or "attractions" in msg_lower:
+        from app.services.itineraries.generator import ItineraryGenerator
+        gen = ItineraryGenerator("data")
+        interests = []
+        if "hiking" in msg_lower or "nature" in msg_lower:
+            interests.extend(["hiking", "nature"])
+        if "food" in msg_lower or "dining" in msg_lower:
+            interests.extend(["dining", "local food"])
+        if "museum" in msg_lower or "culture" in msg_lower:
+            interests.extend(["museum", "culture"])
+        result = gen.generate(interests, 1)
+        stops = [f"{s['time']}: {s['name']} ({s['area']})" for s in result["stops"][:4]]
+        return f"Here's a suggested itinerary: {', '.join(stops)}."
+
+    if "bus" in msg_lower or "tcat" in msg_lower or "transit" in msg_lower:
+        return "TCAT (Tompkins Consolidated Area Transit) is a lower-carbon local transit option. The national proxy factor is ~0.0666 kg CO2e per passenger-mile. Consider using TCAT Route 81 for campus-to-downtown travel."
+
+    if "alternative" in msg_lower or "sustainable" in msg_lower or "lower" in msg_lower:
+        return "Lower-carbon alternatives include: taking intercity buses instead of driving, carpooling, using TCAT locally, walking/biking between nearby attractions, and choosing efficient lodging. Would you like me to calculate savings for a specific scenario?"
+
+    return "I can help you plan a sustainable trip to Ithaca. Ask me about your carbon footprint, itineraries, local attractions, or lower-carbon alternatives."
+
+
+async def _llm_chat(message: str, history: List[ChatMessage], trip_data: Dict) -> Dict:
+    """LLM-powered agent with tool calling."""
+    import httpx
+
+    tools = agent.get_tools()
+    messages = [{"role": "system", "content": "You are STAMP, a sustainable tourism assistant for Ithaca, NY. Help visitors plan lower-carbon trips, understand their carbon footprint, and discover local attractions. Always use tools for calculations - never fabricate emissions figures, routes, or business details. Be concise and helpful."}]
+
+    for msg in history:
+        messages.append({"role": msg.role, "content": msg.content})
+    messages.append({"role": "user", "content": message})
+
+    if trip_data:
+        messages[-1]["content"] += f"\n\nCurrent trip data: {json.dumps(trip_data)}"
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            f"{os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')}/chat/completions",
+            headers={"Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY')}"},
+            json={
+                "model": "gpt-4o-mini",
+                "messages": messages,
+                "tools": tools,
+                "tool_choice": "auto",
+            }
+        )
+        result = response.json()
+        choice = result["choices"][0]["message"]
+
+        # Handle tool calls
+        if choice.get("tool_calls"):
+            tool_results = []
+            for tc in choice["tool_calls"]:
+                tool_name = tc["function"]["name"]
+                tool_args = json.loads(tc["function"]["arguments"])
+                tool_result = await agent.execute_tool(tool_name, tool_args)
+                tool_results.append({
+                    "role": "tool",
+                    "tool_call_id": tc["id"],
+                    "name": tool_name,
+                    "content": json.dumps(tool_result)
+                })
+
+            # Get final response with tool results
+            messages.append({"role": "assistant", "tool_calls": choice["tool_calls"]})
+            messages.extend(tool_results)
+
+            response2 = await client.post(
+                f"{os.environ.get('OPENAI_BASE_URL', 'https://api.openai.com/v1')}/chat/completions",
+                headers={"Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY')}"},
+                json={
+                    "model": "gpt-4o-mini",
+                    "messages": messages,
+                }
+            )
+            result2 = response2.json()
+            return {
+                "response": result2["choices"][0]["message"]["content"],
+                "mode": "llm",
+                "tools_used": [tc["function"]["name"] for tc in choice["tool_calls"]]
+            }
+
+        return {
+            "response": choice["content"],
+            "mode": "llm"
+        }

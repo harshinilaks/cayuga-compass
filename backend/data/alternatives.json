@@ -1,0 +1,158 @@
+{
+  "alternatives": [
+    {
+      "id": "intercity_bus",
+      "name": "Intercity Bus",
+      "category": "getting_here",
+      "description": "Take a coach bus (e.g., FlixBus, OurBus, Trailways) instead of driving or flying",
+      "geographic_coverage": "Northeast US, NY State",
+      "source_url": "https://www.flixbus.com",
+      "applicable_personas": ["regional_weekend_visitor", "leisure_traveler"],
+      "notes": "Lower emissions than solo driving for 1-2 people; ~0.0666 kg CO2e per passenger-mile vs ~0.30 for a car",
+      "verified": true
+    },
+    {
+      "id": "carpool",
+      "name": "Carpooling / Rideshare",
+      "category": "getting_here",
+      "description": "Share a ride with others traveling to Ithaca",
+      "geographic_coverage": "Regional NY",
+      "source_url": null,
+      "applicable_personas": ["regional_weekend_visitor"],
+      "notes": "Divides vehicle emissions across passengers; effective for groups",
+      "verified": true
+    },
+    {
+      "id": "group_shuttle",
+      "name": "Group Shuttles",
+      "category": "getting_here",
+      "description": "Organized shuttles for campus visits, conferences, or events",
+      "geographic_coverage": "Cornell, regional airports",
+      "source_url": null,
+      "applicable_personas": ["university_visitor"],
+      "notes": "Contact Cornell Visitor Relations for shuttle options",
+      "verified": true
+    },
+    {
+      "id": "green_lodging",
+      "name": "Green-Certified Lodging",
+      "category": "lodging",
+      "description": "Stay at eco-certified hotels or inns with sustainability practices",
+      "geographic_coverage": "Ithaca, Tompkins County",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Look for LEED, Green Seal, or Energy Star certifications",
+      "verified": true
+    },
+    {
+      "id": "efficient_hotels",
+      "name": "Efficient Hotels & Inns",
+      "category": "lodging",
+      "description": "Choose hotels with efficient operations and local ownership",
+      "geographic_coverage": "Ithaca",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Locally-owned hotels may have lower operational footprints",
+      "verified": true
+    },
+    {
+      "id": "longer_stays",
+      "name": "Trip Consolidation / Longer Stays",
+      "category": "lodging",
+      "description": "Extend trips and reduce frequency of visits",
+      "geographic_coverage": "N/A",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Fewer trips means less arrival travel per activity day",
+      "verified": true
+    },
+    {
+      "id": "tcat",
+      "name": "TCAT Bus",
+      "category": "getting_around",
+      "description": "Use Tompkins Consolidated Area Transit for local travel",
+      "geographic_coverage": "Tompkins County",
+      "source_url": "https://tcatbus.com",
+      "applicable_personas": ["all"],
+      "notes": "~0.0666 kg CO2e per passenger-mile; covers downtown, Cornell, and airport",
+      "verified": true
+    },
+    {
+      "id": "walking",
+      "name": "Walking",
+      "category": "getting_around",
+      "description": "Walk between nearby attractions instead of driving",
+      "geographic_coverage": "Downtown, Cornell, Collegetown",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Zero emissions; many attractions are walkable",
+      "verified": true
+    },
+    {
+      "id": "biking",
+      "name": "Cycling / Bikeshare",
+      "category": "getting_around",
+      "description": "Bike on trails like the Cayuga Waterfront Trail or use bikeshare",
+      "geographic_coverage": "Ithaca, waterfront",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Zero emissions; Cayuga Waterfront Trail is bike-friendly",
+      "verified": true
+    },
+    {
+      "id": "ev_charging",
+      "name": "EV Charging",
+      "category": "getting_around",
+      "description": "Use EV charging stations if driving an electric vehicle",
+      "geographic_coverage": "Ithaca",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "EV factor ~0.0328 kg CO2e/vehicle-mile vs ~0.30 for gasoline",
+      "verified": true
+    },
+    {
+      "id": "walkable_attractions",
+      "name": "Walkable Attractions",
+      "category": "activities",
+      "description": "Choose attractions within walking distance of your stay",
+      "geographic_coverage": "Downtown, Cornell",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Cluster activities geographically to minimize driving",
+      "verified": true
+    },
+    {
+      "id": "transit_trails",
+      "name": "Trails Near Bus Routes",
+      "category": "activities",
+      "description": "Visit trails and gorges accessible by TCAT",
+      "geographic_coverage": "Tompkins County",
+      "source_url": "https://tcatbus.com",
+      "applicable_personas": ["all"],
+      "notes": "Some trailheads are accessible by TCAT routes",
+      "verified": true
+    },
+    {
+      "id": "car_free_itineraries",
+      "name": "Car-Free Itineraries",
+      "category": "activities",
+      "description": "Plan a full visit without needing a car",
+      "geographic_coverage": "Downtown, Cornell",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "Combines walking, TCAT, and clustered attractions",
+      "verified": true
+    },
+    {
+      "id": "geographic_clustering",
+      "name": "Geographically Clustered Attractions",
+      "category": "activities",
+      "description": "Group activities by location to minimize back-and-forth driving",
+      "geographic_coverage": "Ithaca, Trumansburg",
+      "source_url": null,
+      "applicable_personas": ["all"],
+      "notes": "e.g., Do Cornell campus + Collegetown in one trip",
+      "verified": true
+    }
+  ]
+}
