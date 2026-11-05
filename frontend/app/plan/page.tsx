@@ -72,11 +72,18 @@ export default function PlanPage() {
   const [distanceInfo, setDistanceInfo] = useState<string | null>(null);
   const [personas, setPersonas] = useState<any[]>([]);
   const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+  const [attractions, setAttractions] = useState<any[]>([]);
+  const [selectedAttractions, setSelectedAttractions] = useState<string[]>([]);
+  const [alternatives, setAlternatives] = useState<any>(null);
 
   useEffect(() => {
     fetch('http://localhost:8000/api/personas/')
       .then(res => res.json())
       .then(data => setPersonas(data.personas || []))
+      .catch(() => {});
+    fetch('http://localhost:8000/api/attractions/')
+      .then(res => res.json())
+      .then(data => setAttractions(data.attractions || []))
       .catch(() => {});
   }, []);
 
@@ -253,12 +260,62 @@ export default function PlanPage() {
       });
       const data = await response.json();
       setResults(data);
+      await generateAlternative(data);
       setStep(4);
     } catch (error) {
       console.error('Calculation error:', error);
       alert('Error calculating footprint. Please ensure the backend is running.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const generateAlternative = async (baseline: any) => {
+    try {
+      const altInputs = { ...buildInputs() };
+      if (tripData.travelMode === 'car' || tripData.travelMode === 'suv' || tripData.travelMode === 'rideshare') {
+        altInputs.arrival_mode = 'transport_intercity_bus';
+      } else if (tripData.travelMode === 'air') {
+        altInputs.arrival_mode = 'transport_intercity_bus';
+      }
+      if (tripData.localDrivingMiles > 0) {
+        altInputs.local_driving_miles = 0;
+        altInputs.transit_passenger_miles_per_person = 10;
+      }
+
+      const response = await fetch('http://localhost:8000/api/emissions/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(altInputs),
+      });
+      const altData = await response.json();
+
+      const itineraryRes = await fetch('http://localhost:8000/api/itineraries/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          interests: tripData.activities,
+          days: tripData.days,
+          mobility: 'transit',
+        }),
+      });
+      const itineraryData = await itineraryRes.json();
+
+      setAlternatives({
+        altFootprint: altData,
+        savings: baseline.total - altData.total,
+        percent: baseline.total > 0 ? ((baseline.total - altData.total) / baseline.total) * 100 : 0,
+        itinerary: itineraryData,
+        changes: [
+          tripData.travelMode !== 'air' && tripData.travelMode !== 'bus' && tripData.travelMode !== 'train'
+            ? 'Take intercity bus instead of driving'
+            : null,
+          tripData.localDrivingMiles > 0 ? 'Use TCAT/walking instead of driving locally' : null,
+          'Choose walkable attractions',
+        ].filter(Boolean),
+      });
+    } catch (e) {
+      console.error('Alternative generation error:', e);
     }
   };
 
@@ -775,6 +832,33 @@ export default function PlanPage() {
                 </div>
 
                 <div className="border-t border-gray-200 pt-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">Attractions to visit</h3>
+                  <p className="text-xs text-gray-500 mb-3">Select specific attractions you'd like to include in your itinerary.</p>
+                  <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
+                    {attractions.map((a) => (
+                      <label key={a.id} className="flex items-center p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
+                        <input
+                          type="checkbox"
+                          checked={selectedAttractions.includes(a.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedAttractions([...selectedAttractions, a.id]);
+                            } else {
+                              setSelectedAttractions(selectedAttractions.filter(id => id !== a.id));
+                            }
+                          }}
+                          className="mr-2"
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900">{a.name}</div>
+                          <div className="text-xs text-gray-500">{a.area} · {a.category}</div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
                   <h3 className="font-semibold text-gray-900 mb-3 text-sm">Activities</h3>
                   <div className="space-y-3">
                     {activityOptions.map((activity) => (
@@ -868,23 +952,72 @@ export default function PlanPage() {
                   )}
                 </div>
 
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">Ways to travel lighter</h3>
-                  <div className="space-y-2">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 font-medium text-sm">Take the bus</p>
-                      <p className="text-xs text-gray-600">Compare TCAT routes for getting around.</p>
+                {alternatives && (
+                  <div className="border-t border-gray-200 pt-4">
+                    <h3 className="font-semibold text-gray-900 mb-3 text-sm">Lower-carbon alternative</h3>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                      <div className="flex justify-between items-center mb-3">
+                        <div>
+                          <div className="text-sm text-gray-600">Your current trip</div>
+                          <div className="text-xl font-bold text-gray-900">{results.total.toFixed(0)} kg</div>
+                        </div>
+                        <div className="text-2xl text-gray-300">→</div>
+                        <div>
+                          <div className="text-sm text-green-700">Alternative</div>
+                          <div className="text-xl font-bold text-green-700">{alternatives.altFootprint.total.toFixed(0)} kg</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-between items-center pt-3 border-t border-green-200">
+                        <span className="text-sm font-medium text-green-800">
+                          {alternatives.savings > 0
+                            ? `Save ${alternatives.savings.toFixed(1)} kg CO₂e (${alternatives.percent.toFixed(0)}%)`
+                            : 'No savings calculated'}
+                        </span>
+                      </div>
                     </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 font-medium text-sm">Choose a thoughtful stay</p>
-                      <p className="text-xs text-gray-600">Look for local, efficient accommodations.</p>
-                    </div>
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <p className="text-gray-700 font-medium text-sm">Eat local & plant-forward</p>
-                      <p className="text-xs text-gray-600">Support local food and lower-impact meals.</p>
-                    </div>
+
+                    {alternatives.changes?.length > 0 && (
+                      <div className="mb-4">
+                        <p className="text-sm font-medium text-gray-900 mb-2">Changes:</p>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          {alternatives.changes.map((c: string, i: number) => (
+                            <li key={i} className="flex items-start">
+                              <span className="text-green-600 mr-2">→</span> {c}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {alternatives.itinerary && alternatives.itinerary.stops?.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 mb-2">Suggested itinerary:</p>
+                        <div className="space-y-2">
+                          {alternatives.itinerary.stops.map((stop: any, i: number) => (
+                            <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                              <div>
+                                <div className="font-medium text-gray-900">{stop.name}</div>
+                                <div className="text-xs text-gray-600">{stop.area} · {stop.category}</div>
+                                {stop.notes && <div className="text-xs text-gray-500">{stop.notes}</div>}
+                              </div>
+                              <div className="text-sm text-gray-500">{stop.time}</div>
+                            </div>
+                          ))}
+                        </div>
+                        {alternatives.itinerary.sustainability_tips?.length > 0 && (
+                          <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                            <p className="text-sm font-medium text-green-800">Tips:</p>
+                            <ul className="text-sm text-green-700 list-disc pl-4 mt-1">
+                              {alternatives.itinerary.sustainability_tips.map((tip: string, i: number) => (
+                                <li key={i}>{tip}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
 
                 <div className="pt-2">
                   <button
