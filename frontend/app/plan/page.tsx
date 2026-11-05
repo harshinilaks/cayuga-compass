@@ -272,23 +272,12 @@ export default function PlanPage() {
 
   const generateAlternative = async (baseline: any) => {
     try {
-      const altInputs = { ...buildInputs() };
-      if (tripData.travelMode === 'car' || tripData.travelMode === 'suv' || tripData.travelMode === 'rideshare') {
-        altInputs.arrival_mode = 'transport_intercity_bus';
-      } else if (tripData.travelMode === 'air') {
-        altInputs.arrival_mode = 'transport_intercity_bus';
-      }
-      if (tripData.localDrivingMiles > 0) {
-        altInputs.local_driving_miles = 0;
-        altInputs.transit_passenger_miles_per_person = 10;
-      }
-
-      const response = await fetch('http://localhost:8000/api/emissions/calculate', {
+      const response = await fetch('http://localhost:8000/api/alternatives/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(altInputs),
+        body: JSON.stringify({ baseline: buildInputs() }),
       });
-      const altData = await response.json();
+      const data = await response.json();
 
       const itineraryRes = await fetch('http://localhost:8000/api/itineraries/generate', {
         method: 'POST',
@@ -302,17 +291,8 @@ export default function PlanPage() {
       const itineraryData = await itineraryRes.json();
 
       setAlternatives({
-        altFootprint: altData,
-        savings: baseline.total - altData.total,
-        percent: baseline.total > 0 ? ((baseline.total - altData.total) / baseline.total) * 100 : 0,
+        ...data,
         itinerary: itineraryData,
-        changes: [
-          tripData.travelMode !== 'air' && tripData.travelMode !== 'bus' && tripData.travelMode !== 'train'
-            ? 'Take intercity bus instead of driving'
-            : null,
-          tripData.localDrivingMiles > 0 ? 'Use TCAT/walking instead of driving locally' : null,
-          'Choose walkable attractions',
-        ].filter(Boolean),
       });
     } catch (e) {
       console.error('Alternative generation error:', e);
@@ -954,39 +934,41 @@ export default function PlanPage() {
 
                 {alternatives && (
                   <div className="border-t border-gray-200 pt-4">
-                    <h3 className="font-semibold text-gray-900 mb-3 text-sm">Lower-carbon alternative</h3>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                      <div className="flex justify-between items-center mb-3">
-                        <div>
-                          <div className="text-sm text-gray-600">Your current trip</div>
-                          <div className="text-xl font-bold text-gray-900">{results.total.toFixed(0)} kg</div>
-                        </div>
-                        <div className="text-2xl text-gray-300">→</div>
-                        <div>
-                          <div className="text-sm text-green-700">Alternative</div>
-                          <div className="text-xl font-bold text-green-700">{alternatives.altFootprint.total.toFixed(0)} kg</div>
-                        </div>
+                    <h3 className="font-semibold text-gray-900 mb-3 text-sm">Lower-carbon alternatives</h3>
+                    {alternatives.alternatives?.length > 0 ? (
+                      <div className="space-y-3 mb-4">
+                        {alternatives.alternatives.map((alt: any, i: number) => (
+                          <div key={i} className="bg-white border border-gray-200 rounded-lg p-4">
+                            <div className="flex justify-between items-start mb-2">
+                              <div>
+                                <div className="font-medium text-gray-900">{alt.name}</div>
+                                <div className="text-xs text-gray-600">{alt.description}</div>
+                              </div>
+                              <div className={`text-xs px-2 py-1 rounded-full ${
+                                alt.feasibility === 'high' ? 'bg-green-100 text-green-700' :
+                                alt.feasibility === 'medium' ? 'bg-yellow-100 text-yellow-700' :
+                                'bg-gray-100 text-gray-500'
+                              }`}>
+                                {alt.feasibility}
+                              </div>
+                            </div>
+                            <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                              <div className="text-sm">
+                                <span className="text-gray-600">Footprint: </span>
+                                <span className="font-medium">{alt.footprint.total.toFixed(1)} kg</span>
+                              </div>
+                              <div className="text-sm font-medium text-green-700">
+                                {alt.savings_kg > 0 ? `Save ${alt.savings_kg} kg (${alt.savings_pct}%)` : 'No savings'}
+                              </div>
+                            </div>
+                            {alt.tradeoffs && (
+                              <p className="text-xs text-gray-500 mt-2">⚠ {alt.tradeoffs}</p>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <div className="flex justify-between items-center pt-3 border-t border-green-200">
-                        <span className="text-sm font-medium text-green-800">
-                          {alternatives.savings > 0
-                            ? `Save ${alternatives.savings.toFixed(1)} kg CO₂e (${alternatives.percent.toFixed(0)}%)`
-                            : 'No savings calculated'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {alternatives.changes?.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-sm font-medium text-gray-900 mb-2">Changes:</p>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          {alternatives.changes.map((c: string, i: number) => (
-                            <li key={i} className="flex items-start">
-                              <span className="text-green-600 mr-2">→</span> {c}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No lower-carbon alternatives found for your trip.</p>
                     )}
 
                     {alternatives.itinerary && alternatives.itinerary.stops?.length > 0 && (
