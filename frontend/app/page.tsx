@@ -11,6 +11,9 @@ export default function Home() {
             <div className="flex space-x-8 text-sm font-medium">
               <Link href="/" className="text-green-700">Explore</Link>
               <Link href="/plan" className="text-gray-600 hover:text-green-700 transition-colors">Plan Your Trip</Link>
+              <Link href="/itineraries" className="text-gray-600 hover:text-green-700 transition-colors">Itineraries</Link>
+              <Link href="/alternatives" className="text-gray-600 hover:text-green-700 transition-colors">Alternatives</Link>
+              <Link href="/agent" className="text-gray-600 hover:text-green-700 transition-colors">AI Assistant</Link>
               <Link href="/methodology" className="text-gray-600 hover:text-green-700 transition-colors">Methodology</Link>
             </div>
           </div>
