@@ -114,6 +114,18 @@ export default function PlanPage() {
     return 'transport_passenger_car_gasoline';
   };
 
+  const getLodgingFactor = () => {
+    switch (tripData.accommodationType) {
+      case 'hotel': return 'lodging_hotel_us_average';
+      case 'inn': return 'lodging_bed_breakfast';
+      case 'rental': return 'lodging_vacation_rental';
+      case 'hostel': return 'lodging_unavailable';
+      case 'camping': return 'lodging_campground';
+      case 'family': return 'lodging_friends_family';
+      default: return 'lodging_hotel_us_average';
+    }
+  };
+
   const buildInputs = () => ({
     arrival_mode: getArrivalMode(),
     one_way_distance_miles: tripData.oneWayDistance,
@@ -123,9 +135,7 @@ export default function PlanPage() {
     local_driving_miles: tripData.localDrivingMiles,
     local_vehicle_type: 'transport_passenger_car_gasoline',
     transit_passenger_miles_per_person: tripData.transitMilesPerPerson,
-    lodging_type: tripData.accommodationType === 'hotel' ? 'lodging_hotel_us_average' :
-                 tripData.accommodationType === 'family' ? 'lodging_friends_family' :
-                 'lodging_hotel_us_average',
+    lodging_type: getLodgingFactor(),
     nights: tripData.nights,
     rooms: tripData.rooms,
     food_type: 'food_full_service',
@@ -462,6 +472,17 @@ export default function PlanPage() {
                       </option>
                     ))}
                   </select>
+                  {tripData.accommodationType !== 'hotel' && tripData.accommodationType !== 'family' && (
+                    <p className="text-xs text-yellow-600 mt-2 bg-yellow-50 p-2 rounded">
+                      ⚠ No verified emissions factor available for this lodging type. It will be flagged as an incomplete estimate.
+                    </p>
+                  )}
+                  {tripData.accommodationType === 'hotel' && (
+                    <p className="text-xs text-green-600 mt-2">Using US average hotel factor (16.1 kg CO₂e/room-night)</p>
+                  )}
+                  {tripData.accommodationType === 'family' && (
+                    <p className="text-xs text-green-600 mt-2">Zero incremental emissions assumed</p>
+                  )}
                 </div>
 
                 <div>
@@ -616,6 +637,20 @@ export default function PlanPage() {
                       <span className="font-medium text-gray-900">{(results.local_mobility + results.food + results.activities).toFixed(0)} kg</span>
                     </div>
                   </div>
+                  {results.missing_factors && results.missing_factors.length > 0 && (
+                    <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p className="text-xs text-yellow-700 font-medium">
+                        ⚠ Incomplete estimate: {results.missing_factors.join(', ')}
+                      </p>
+                    </div>
+                  )}
+                  {results.unverified_factors && results.unverified_factors.length > 0 && (
+                    <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-xs text-blue-700 font-medium">
+                        ℹ Approximate factors used: {results.unverified_factors.join(', ')}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div>

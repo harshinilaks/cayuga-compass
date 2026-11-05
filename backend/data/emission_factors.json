@@ -209,6 +209,19 @@
       "limitations": "No standard source available."
     },
     {
+      "id": "lodging_unavailable",
+      "category": "lodging",
+      "name": "Hostel",
+      "value": null,
+      "unit": "room-night",
+      "source_organization": "N/A",
+      "source_document": "No standard source",
+      "publication_year": null,
+      "verification_status": "unavailable",
+      "assumptions": null,
+      "limitations": "No verified factor available for hostel stays."
+    },
+    {
       "id": "lodging_friends_family",
       "category": "lodging",
       "name": "Staying with friends / family",
