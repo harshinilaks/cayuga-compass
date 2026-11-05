@@ -110,17 +110,33 @@ class CarbonCalculator:
                 if lodging_factor["verification_status"] == "approximate":
                     results["unverified_factors"].append(f"lodging: {lodging_factor['name']}")
 
-        # Food
-        food_factor = self.get_factor(inputs.get("food_type"))
-        if food_factor and food_factor["value"] is not None:
-            results["food"] = (
-                inputs["food_spending_per_person_per_day"]
-                * inputs["party_size"]
-                * inputs["days"]
-                * food_factor["value"]
-            )
-            if food_factor["verification_status"] == "approximate":
-                results["unverified_factors"].append(f"food: {food_factor['name']}")
+        # Food - support multiple food categories
+        food_categories = inputs.get("food_categories", [])
+        if food_categories:
+            # Use new multi-category format
+            for cat in food_categories:
+                food_factor = self.get_factor(cat.get("type"))
+                if food_factor and food_factor["value"] is not None:
+                    results["food"] += (
+                        cat["spending_per_person_per_day"]
+                        * inputs["party_size"]
+                        * inputs["days"]
+                        * food_factor["value"]
+                    )
+                    if food_factor["verification_status"] == "approximate":
+                        results["unverified_factors"].append(f"food: {food_factor['name']}")
+        else:
+            # Fallback to single food type for backward compatibility
+            food_factor = self.get_factor(inputs.get("food_type"))
+            if food_factor and food_factor["value"] is not None:
+                results["food"] = (
+                    inputs["food_spending_per_person_per_day"]
+                    * inputs["party_size"]
+                    * inputs["days"]
+                    * food_factor["value"]
+                )
+                if food_factor["verification_status"] == "approximate":
+                    results["unverified_factors"].append(f"food: {food_factor['name']}")
 
         # Activities
         for activity in inputs.get("activities", []):

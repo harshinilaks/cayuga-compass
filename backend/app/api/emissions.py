@@ -9,6 +9,11 @@ router = APIRouter()
 calculator = CarbonCalculator()
 
 
+class FoodCategory(BaseModel):
+    type: str
+    spending_per_person_per_day: float
+
+
 class TripInputs(BaseModel):
     arrival_mode: str
     one_way_distance_miles: float
@@ -23,6 +28,7 @@ class TripInputs(BaseModel):
     rooms: int
     food_type: str
     food_spending_per_person_per_day: float
+    food_categories: List[FoodCategory] = []
     days: int
     activities: List[dict]
 

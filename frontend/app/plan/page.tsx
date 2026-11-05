@@ -21,6 +21,7 @@ type TripData = {
   days: number;
   foodType: string;
   foodSpendPerPersonPerDay: number;
+  foodCategories: { type: string; spend: number }[];
   activitySpend: Record<string, number>;
 };
 
@@ -44,6 +45,7 @@ export default function PlanPage() {
     days: 1,
     foodType: 'full_service',
     foodSpendPerPersonPerDay: 50,
+    foodCategories: [{ type: 'full_service', spend: 50 }],
     activitySpend: {},
   });
 
@@ -196,12 +198,18 @@ export default function PlanPage() {
     lodging_type: getLodgingFactor(),
     nights: tripData.nights,
     rooms: tripData.rooms,
-    food_type: tripData.foodType === 'full_service' ? 'food_full_service' :
-               tripData.foodType === 'fast_casual' ? 'food_fast_casual' :
-               tripData.foodType === 'cafe' ? 'food_cafe' :
-               tripData.foodType === 'bar' ? 'food_bar' :
-               'food_full_service',
-    food_spending_per_person_per_day: tripData.foodSpendPerPersonPerDay,
+    food_type: 'food_full_service',
+    food_spending_per_person_per_day: 0,
+    food_categories: tripData.foodCategories
+      .filter(c => c.spend > 0)
+      .map(c => ({
+        type: c.type === 'full_service' ? 'food_full_service' :
+              c.type === 'fast_casual' ? 'food_fast_casual' :
+              c.type === 'cafe' ? 'food_cafe' :
+              c.type === 'bar' ? 'food_bar' :
+              'food_full_service',
+        spending_per_person_per_day: c.spend,
+      })),
     days: tripData.days,
     activities: Object.entries(tripData.activitySpend)
       .filter(([_, spend]) => spend > 0)
@@ -708,30 +716,61 @@ export default function PlanPage() {
 
                 <div className="border-t border-gray-200 pt-4">
                   <h3 className="font-semibold text-gray-900 mb-3 text-sm">Food & Dining</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">Restaurant type</label>
-                      <select
-                        value={tripData.foodType}
-                        onChange={(e) => setTripData({ ...tripData, foodType: e.target.value })}
-                        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                      >
-                        <option value="full_service">Full-service restaurant</option>
-                        <option value="fast_casual">Fast casual</option>
-                        <option value="cafe">Cafe / snack bar</option>
-                        <option value="bar">Bar / drinking place</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">$ per person per day</label>
-                      <input
-                        type="number"
-                        value={tripData.foodSpendPerPersonPerDay || ''}
-                        onChange={(e) => setTripData({ ...tripData, foodSpendPerPersonPerDay: parseFloat(e.target.value) || 0 })}
-                        placeholder="50"
-                        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
-                      />
-                    </div>
+                  <div className="space-y-3">
+                    {tripData.foodCategories.map((cat, i) => (
+                      <div key={i} className="grid grid-cols-2 gap-3 items-end">
+                        <div>
+                          <label className="block text-xs font-medium text-gray-700 mb-1">Restaurant type</label>
+                          <select
+                            value={cat.type}
+                            onChange={(e) => {
+                              const updated = [...tripData.foodCategories];
+                              updated[i].type = e.target.value;
+                              setTripData({ ...tripData, foodCategories: updated });
+                            }}
+                            className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                          >
+                            <option value="full_service">Full-service</option>
+                            <option value="fast_casual">Fast casual</option>
+                            <option value="cafe">Cafe / snack bar</option>
+                            <option value="bar">Bar / drinking place</option>
+                          </select>
+                        </div>
+                        <div className="flex items-end gap-2">
+                          <div className="flex-1">
+                            <label className="block text-xs font-medium text-gray-700 mb-1">$ per person per day</label>
+                            <input
+                              type="number"
+                              value={cat.spend || ''}
+                              onChange={(e) => {
+                                const updated = [...tripData.foodCategories];
+                                updated[i].spend = parseFloat(e.target.value) || 0;
+                                setTripData({ ...tripData, foodCategories: updated });
+                              }}
+                              placeholder="50"
+                              className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                            />
+                          </div>
+                          {tripData.foodCategories.length > 1 && (
+                            <button
+                              onClick={() => {
+                                const updated = tripData.foodCategories.filter((_, idx) => idx !== i);
+                                setTripData({ ...tripData, foodCategories: updated });
+                              }}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg text-sm"
+                            >
+                              ✕
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    <button
+                      onClick={() => setTripData({ ...tripData, foodCategories: [...tripData.foodCategories, { type: 'fast_casual', spend: 0 }] })}
+                      className="text-sm text-green-700 hover:text-green-800 font-medium"
+                    >
+                      + Add another food category
+                    </button>
                   </div>
                 </div>
 
