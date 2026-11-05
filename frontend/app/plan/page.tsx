@@ -19,6 +19,9 @@ type TripData = {
   localDrivingMiles: number;
   transitMilesPerPerson: number;
   days: number;
+  foodType: string;
+  foodSpendPerPersonPerDay: number;
+  activitySpend: Record<string, number>;
 };
 
 export default function PlanPage() {
@@ -39,6 +42,9 @@ export default function PlanPage() {
     localDrivingMiles: 0,
     transitMilesPerPerson: 0,
     days: 1,
+    foodType: 'full_service',
+    foodSpendPerPersonPerDay: 50,
+    activitySpend: {},
   });
 
   const [loading, setLoading] = useState(false);
@@ -62,6 +68,58 @@ export default function PlanPage() {
   }>({ arrival: 0, lodging: 0, activities_total: 0, total: 0 });
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [distanceInfo, setDistanceInfo] = useState<string | null>(null);
+  const [personas, setPersonas] = useState<any[]>([]);
+  const [selectedPersona, setSelectedPersona] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/personas/')
+      .then(res => res.json())
+      .then(data => setPersonas(data.personas || []))
+      .catch(() => {});
+  }, []);
+
+  const applyPersona = (personaId: string) => {
+    const persona = personas.find(p => p.id === personaId);
+    if (!persona) return;
+    setSelectedPersona(personaId);
+    setTripData(prev => ({
+      ...prev,
+      origin: persona.origin,
+      partySize: persona.party_size,
+      nights: persona.nights,
+      days: persona.days,
+      travelMode: persona.arrival.mode === 'transport_passenger_car_gasoline' ? 'car' :
+                  persona.arrival.mode === 'transport_air_medium_haul' ? 'air' :
+                  persona.arrival.mode === 'transport_air_short_haul' ? 'air' :
+                  persona.arrival.mode === 'transport_air_long_haul' ? 'air' : 'car',
+      oneWayDistance: persona.arrival.one_way_distance_miles,
+      tripType: persona.arrival.round_trip ? 'round' : 'one-way',
+      vehicles: persona.arrival.vehicles || 1,
+      accommodationType: 'hotel',
+      rooms: persona.lodging.rooms,
+      localDrivingMiles: persona.local_mobility.driving_miles,
+      transitMilesPerPerson: persona.local_mobility.transit_passenger_miles_per_person,
+      foodType: 'full_service',
+      foodSpendPerPersonPerDay: persona.food.spending_per_person_per_day,
+      activitySpend: Object.fromEntries(
+        persona.activities.map((a: any) => [
+          a.category === 'activity_festivals_events' ? 'events' :
+          a.category === 'activity_shopping' ? 'shopping' :
+          a.category === 'activity_wineries' ? 'wineries' :
+          a.category === 'activity_outdoor_recreation' ? 'hiking' :
+          a.category === 'activity_museums' ? 'museums' : 'hiking',
+          a.spending_whole_party
+        ])
+      ),
+      activities: persona.activities.map((a: any) =>
+        a.category === 'activity_festivals_events' ? 'events' :
+        a.category === 'activity_shopping' ? 'shopping' :
+        a.category === 'activity_wineries' ? 'wineries' :
+        a.category === 'activity_outdoor_recreation' ? 'hiking' :
+        a.category === 'activity_museums' ? 'museums' : 'hiking'
+      ),
+    }));
+  };
 
   const transportationModes = [
     { id: 'air', label: 'Plane', icon: '✈' },
@@ -138,10 +196,24 @@ export default function PlanPage() {
     lodging_type: getLodgingFactor(),
     nights: tripData.nights,
     rooms: tripData.rooms,
-    food_type: 'food_full_service',
-    food_spending_per_person_per_day: 50,
+    food_type: tripData.foodType === 'full_service' ? 'food_full_service' :
+               tripData.foodType === 'fast_casual' ? 'food_fast_casual' :
+               tripData.foodType === 'cafe' ? 'food_cafe' :
+               tripData.foodType === 'bar' ? 'food_bar' :
+               'food_full_service',
+    food_spending_per_person_per_day: tripData.foodSpendPerPersonPerDay,
     days: tripData.days,
-    activities: [],
+    activities: Object.entries(tripData.activitySpend)
+      .filter(([_, spend]) => spend > 0)
+      .map(([category, spend]) => ({
+        category: category === 'hiking' || category === 'water' ? 'activity_outdoor_recreation' :
+                  category === 'museums' ? 'activity_museums' :
+                  category === 'wineries' ? 'activity_wineries' :
+                  category === 'shopping' ? 'activity_shopping' :
+                  category === 'events' ? 'activity_festivals_events' :
+                  'activity_outdoor_recreation',
+        spending_whole_party: spend,
+      })),
   });
 
   const calculatePartial = async () => {
@@ -348,6 +420,28 @@ export default function PlanPage() {
           <div className="lg:col-span-2 bg-white rounded-lg p-6">
             {step === 1 && (
               <div className="space-y-5">
+                {personas.length > 0 && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                    <label className="block text-sm font-medium text-green-800 mb-2">
+                      Or start with a visitor persona:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {personas.map((p) => (
+                        <button
+                          key={p.id}
+                          onClick={() => applyPersona(p.id)}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+                            selectedPersona === p.id
+                              ? 'bg-green-700 text-white'
+                              : 'bg-white text-green-700 border border-green-300 hover:bg-green-100'
+                          }`}
+                        >
+                          {p.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Travel mode</label>
                   <p className="text-xs text-gray-500 mb-2">Choose the main way you&apos;ll arrive.</p>
@@ -572,26 +666,108 @@ export default function PlanPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">Activities planned · Select all that apply</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Days in Tompkins County</label>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setTripData({ ...tripData, days: Math.max(1, tripData.days - 1) })}
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
+                    >
+                      −
+                    </button>
+                    <span className="text-base font-medium w-6 text-center">{tripData.days}</span>
+                    <button
+                      onClick={() => setTripData({ ...tripData, days: tripData.days + 1 })}
+                      className="w-7 h-7 bg-gray-100 rounded-lg hover:bg-gray-200 transition text-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Local driving miles (total)</label>
+                  <input
+                    type="number"
+                    value={tripData.localDrivingMiles || ''}
+                    onChange={(e) => setTripData({ ...tripData, localDrivingMiles: parseFloat(e.target.value) || 0 })}
+                    placeholder="30"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Transit passenger-miles per person</label>
+                  <input
+                    type="number"
+                    value={tripData.transitMilesPerPerson || ''}
+                    onChange={(e) => setTripData({ ...tripData, transitMilesPerPerson: parseFloat(e.target.value) || 0 })}
+                    placeholder="0"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                  />
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">Food & Dining</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">Restaurant type</label>
+                      <select
+                        value={tripData.foodType}
+                        onChange={(e) => setTripData({ ...tripData, foodType: e.target.value })}
+                        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                      >
+                        <option value="full_service">Full-service restaurant</option>
+                        <option value="fast_casual">Fast casual</option>
+                        <option value="cafe">Cafe / snack bar</option>
+                        <option value="bar">Bar / drinking place</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">$ per person per day</label>
+                      <input
+                        type="number"
+                        value={tripData.foodSpendPerPersonPerDay || ''}
+                        onChange={(e) => setTripData({ ...tripData, foodSpendPerPersonPerDay: parseFloat(e.target.value) || 0 })}
+                        placeholder="50"
+                        className="w-full p-2 border border-gray-300 rounded-lg text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  <h3 className="font-semibold text-gray-900 mb-3 text-sm">Activities</h3>
+                  <div className="space-y-3">
                     {activityOptions.map((activity) => (
-                      <label key={activity.id} className="flex items-center p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
-                        <input
-                          type="checkbox"
-                          checked={tripData.activities.includes(activity.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setTripData({ ...tripData, activities: [...tripData.activities, activity.id] });
-                            } else {
-                              setTripData({ ...tripData, activities: tripData.activities.filter((a) => a !== activity.id) });
-                            }
-                          }}
-                          className="mr-2"
-                        />
-                        {activity.label}
-                      </label>
+                      <div key={activity.id} className="flex items-center space-x-3">
+                        <label className="flex items-center flex-1 p-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer text-sm">
+                          <input
+                            type="checkbox"
+                            checked={tripData.activities.includes(activity.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setTripData({ ...tripData, activities: [...tripData.activities, activity.id] });
+                              } else {
+                                setTripData({ ...tripData, activities: tripData.activities.filter((a) => a !== activity.id), activitySpend: { ...tripData.activitySpend, [activity.id]: 0 } });
+                              }
+                            }}
+                            className="mr-2"
+                          />
+                          {activity.label}
+                        </label>
+                        {tripData.activities.includes(activity.id) && (
+                          <input
+                            type="number"
+                            value={tripData.activitySpend[activity.id] || ''}
+                            onChange={(e) => setTripData({ ...tripData, activitySpend: { ...tripData.activitySpend, [activity.id]: parseFloat(e.target.value) || 0 } })}
+                            placeholder="$ spend"
+                            className="w-24 p-2 border border-gray-300 rounded-lg text-sm"
+                          />
+                        )}
+                      </div>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-2">Enter estimated spending for your whole party.</p>
                 </div>
 
                 <div className="pt-2">
