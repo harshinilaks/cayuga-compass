@@ -35,7 +35,7 @@ export default function AlternativesPage() {
           <div className="flex justify-between items-center">
             <Link href="/" className="text-2xl font-bold text-green-800">Cayuga Compass</Link>
             <div className="flex items-center space-x-6 text-sm">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">Explore</Link>
+              <Link href="/explore" className="text-gray-600 hover:text-gray-900">Explore</Link>
               <Link href="/plan" className="text-gray-600 hover:text-gray-900">Plan your trip</Link>
               <Link href="/methodology" className="text-gray-600 hover:text-gray-900">Methodology</Link>
               <Link href="/plan" className="bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">

@@ -77,12 +77,27 @@ def _deterministic_fallback(message: str, trip_data: Dict) -> str:
         return response
 
     if "bus" in msg_lower or "tcat" in msg_lower or "transit" in msg_lower:
-        return "TCAT (Tompkins Consolidated Area Transit) is a lower-carbon local transit option. The national proxy factor is ~0.0666 kg CO2e per passenger-mile. Consider using TCAT Route 81 for campus-to-downtown travel."
+        return ("TCAT (Tompkins Consolidated Area Transit) is the main car-free option: $1.50 per ride "
+                "(daily cap $3, free under 18), all buses wheelchair accessible. Documented attraction "
+                "connections include Route 67 to Buttermilk and Treman, Route 31 to the Lab of Ornithology, "
+                "and Route 13 to the Farmers Market and Stewart Park. Park routes 22/23 run in summer only. "
+                "Confirm schedules at tcatbus.com.")
+
+    if "hotel" in msg_lower or "stay" in msg_lower or "lodging" in msg_lower or "b&b" in msg_lower or "camp" in msg_lower:
+        result = agent._search_lodging({"query": msg_lower})
+        props = result.get("properties", [])
+        if props:
+            p = props[0]
+            note = f" Sustainability: {p['certification_status']}" if p.get("certification_status") else ""
+            return (f"{p['name']} ({p['area']}) - {p['description']}. "
+                    f"Walkability: {p['walkability']}. Transport: {', '.join(p.get('transportation_access', []))}.{note}")
+        return ("I can search our researched lodging - hotels, inns, B&Bs, glamping, camping, and farm stays. "
+                "Tell me a name or the kind of place you're looking for.")
 
     if "alternative" in msg_lower or "sustainable" in msg_lower or "lower" in msg_lower:
-        return "Lower-carbon alternatives include: taking intercity buses instead of driving, carpooling, using TCAT locally, walking/biking between nearby attractions, and choosing efficient lodging. Would you like me to calculate savings for a specific scenario?"
+        return "Lower-carbon alternatives include: taking intercity buses (OurBus, Greyhound, FlixBus, Cornell Campus-to-Campus) instead of driving, carpooling, using TCAT locally, walking/biking the Cayuga Waterfront and Black Diamond trails, and choosing documented walkable lodging. Would you like me to calculate savings for a specific scenario?"
 
-    return "I can help you plan a sustainable trip to Ithaca. Ask me about your carbon footprint, itineraries, local attractions, or lower-carbon alternatives."
+    return "I can help you plan a sustainable trip to Ithaca. Ask me about your carbon footprint, itineraries, local attractions, where to stay, getting around, or lower-carbon alternatives."
 
 
 async def _llm_chat(message: str, history: List[ChatMessage], trip_data: Dict) -> Dict:
@@ -90,7 +105,7 @@ async def _llm_chat(message: str, history: List[ChatMessage], trip_data: Dict) -
     import httpx
 
     tools = agent.get_tools()
-    messages = [{"role": "system", "content": "You are Cayuga Compass, a sustainable tourism assistant for Ithaca, NY. Help visitors plan lower-carbon trips, understand their carbon footprint, and discover local attractions. Always use tools for calculations - never fabricate emissions figures, routes, or business details. Be concise and helpful."}]
+    messages = [{"role": "system", "content": "You are Cayuga Compass, a sustainable tourism assistant for Ithaca, NY. Help visitors plan lower-carbon trips, understand their carbon footprint, and discover local attractions. Always use tools for calculations - never fabricate emissions figures, transit routes, schedules, business hours, admission prices, fares, certifications, or travel times. Prefer documented data with verification status; flag anything provisional or seasonal and link to the official source when unsure. Ask clarifying questions when inputs needed for a calculation are missing. Be concise and helpful."}]
 
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})

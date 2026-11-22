@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 from app.services.carbon.calculator import CarbonCalculator
 
 
@@ -9,9 +9,16 @@ class AlternativesMatcher:
         self.data_dir = Path(data_dir)
         self.calculator = CarbonCalculator()
         self.alternatives = self._load_json("alternatives.json")
+        self.lodging = self._load_json("lodging.json")
+        self.transportation = self._load_json("transportation.json")
+        self.connections = self._load_json("mobility_connections.json")
+        self.attractions = self._load_json("attractions.json")
 
     def _load_json(self, filename: str) -> Dict:
-        with open(self.data_dir / filename, "r") as f:
+        path = self.data_dir / filename
+        if not path.exists():
+            return {}
+        with open(path, "r") as f:
             return json.load(f)
 
     def generate_alternatives(self, baseline_inputs: Dict) -> Dict:
@@ -285,3 +292,106 @@ class AlternativesMatcher:
             })
 
         return alts
+
+    def recommend(self, context: Dict) -> Dict:
+        """Context-aware qualitative recommendations grounded in the local
+        datasets. Each item states what supports it and its limits; numerical
+        savings are only produced when trip inputs allow a real calculation."""
+        recs = []
+        lodging_id = context.get("lodging_id")
+        mobility = context.get("mobility", "car")
+        season_month = context.get("season_month")
+        origin_region = (context.get("origin") or "").lower()
+        interests = context.get("interests", [])
+
+        lodging = next((p for p in self.lodging.get("properties", [])
+                        if p["id"] == lodging_id), None) if lodging_id else None
+
+        # 1. Lodging location context
+        if lodging:
+            if not lodging.get("car_free_feasible"):
+                recs.append({
+                    "change": "Plan on having a car or arranging rides",
+                    "why": f"{lodging['name']} is in {lodging['area']} with limited documented transportation access ({', '.join(lodging.get('transportation_access', []))}).",
+                    "support": f"Research documents walkability as: {lodging.get('walkability')}",
+                    "limitations": "Car-free travel is possible but not documented for this property; confirm with the property.",
+                    "quantifiable": False,
+                    "category": "lodging",
+                })
+            else:
+                near = self._walkable_attractions_for_lodging(lodging)
+                if near:
+                    recs.append({
+                        "change": "Walk to nearby attractions instead of driving",
+                        "why": f"{lodging['name']} is documented as car-free feasible with good walkability.",
+                        "support": "Walkable attractions: " + ", ".join(n["name"] for n in near[:4]),
+                        "limitations": "Distances are approximate; check the map before setting out.",
+                        "quantifiable": True,
+                        "category": "getting_around",
+                    })
+
+        # 2. Mobility: driving visitor -> documented transit connections
+        if mobility in ("car", "drive", "rideshare"):
+            tcat = next((s for s in self.transportation.get("services", []) if s["id"] == "tcat"), None)
+            conns = [c for c in self.connections.get("connections", [])
+                     if c.get("status") in ("confirmed_year_round", "summer_only")]
+            recs.append({
+                "change": "Use TCAT for documented attraction connections",
+                "why": "Several attractions have research-documented TCAT access; TCAT costs $1.50/ride (daily cap $3) vs. parking and gas.",
+                "support": f"{len(conns)} documented connections, e.g. " +
+                           "; ".join(f"{c.get('route_detail')}" for c in conns[:2]),
+                "limitations": "Schedules change; confirm routes on tcatbus.com. " +
+                               (tcat.get("schedule_notes") if tcat else ""),
+                "quantifiable": True,
+                "service_id": "tcat",
+                "category": "getting_around",
+            })
+
+        # 3. Seasonal state-park visits
+        if season_month:
+            summer_only = [c for c in self.connections.get("connections", [])
+                           if c.get("status") == "summer_only" and c.get("attraction_id")]
+            attr_names = {a["id"]: a["name"] for a in self.attractions.get("attractions", [])}
+            affected = [f"{attr_names.get(c['attraction_id'], c['attraction_id'])} ({c.get('route_detail')})"
+                        for c in summer_only]
+            if affected and season_month not in (6, 7, 8):
+                recs.append({
+                    "change": "Check seasonal transit before planning park visits",
+                    "why": "Some park bus routes run in summer only; for your dates they are not documented as operating.",
+                    "support": "; ".join(affected),
+                    "limitations": "Exact summer dates vary by year; verify at tcatbus.com or parks.ny.gov.",
+                    "quantifiable": False,
+                    "category": "activities",
+                })
+
+        # 4. Intercity visitors from the NYC metro
+        if any(k in origin_region for k in ("new york", "nyc", "manhattan", "brooklyn", "queens", "bronx", "jersey")):
+            buses = [s for s in self.transportation.get("services", [])
+                     if s["mode"] == "intercity_bus"]
+            recs.append({
+                "change": "Consider an intercity bus instead of driving",
+                "why": "Documented intercity bus options run Ithaca-NYC daily; per-passenger emissions are typically far below a solo drive.",
+                "support": "; ".join(f"{s['name']} - {s.get('origins_destinations', '')}" for s in buses[:3]),
+                "limitations": "Fares and schedules are research-documented and fluctuate; numerical savings depend on your party size and vehicle - run the calculator for an exact comparison.",
+                "quantifiable": True,
+                "category": "getting_here",
+            })
+
+        return {"recommendations": recs, "context": {
+            "lodging_id": lodging_id, "mobility": mobility,
+            "season_month": season_month, "origin": context.get("origin"),
+        }}
+
+    def _walkable_attractions_for_lodging(self, lodging: Dict) -> List[Dict]:
+        """Attractions documented as near this property or in walkable areas
+        of the same broad area."""
+        nearby_ids = set(lodging.get("nearby_attractions", []))
+        walkable = []
+        for a in self.attractions.get("attractions", []):
+            if a["id"] in nearby_ids:
+                walkable.append(a)
+            elif (a.get("tcat_access", {}).get("status") == "not_pinned_walkable"
+                  and any(w in a.get("area", "").lower() for w in ("downtown", "cornell", "collegetown"))
+                  and any(w in lodging.get("area", "").lower() for w in ("downtown", "cornell", "collegetown"))):
+                walkable.append(a)
+        return walkable

@@ -45,6 +45,80 @@ class CayugaCompassAgent:
             {
                 "type": "function",
                 "function": {
+                    "name": "get_attraction_details",
+                    "description": "Get full details for one attraction: hours, admission, seasonality, TCAT/walk/bike access, sources",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "attraction_id": {"type": "string", "description": "Attraction ID"}
+                        },
+                        "required": ["attraction_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "search_lodging",
+                    "description": "Search researched lodging properties (hotels, inns, B&Bs, camping, farm stays)",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "query": {"type": "string", "description": "Search term"},
+                            "accommodation_type": {"type": "string", "description": "hotel, motel, inn, bed_breakfast, glamping, camping, farm_stay"}
+                        },
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_lodging_details",
+                    "description": "Get full details for one lodging property: sustainability practices, certification status, transport access, walkability",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "lodging_id": {"type": "string", "description": "Property ID"}
+                        },
+                        "required": ["lodging_id"]
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "search_transportation",
+                    "description": "Search documented transportation services (TCAT, intercity buses, paratransit, carshare, trails, EV charging)",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "query": {"type": "string", "description": "Search term"},
+                            "scope": {"type": "string", "description": "local, regional, or intercity"},
+                            "mode": {"type": "string", "description": "bus_transit, intercity_bus, air, carshare, walking, biking, ev_charging, etc."}
+                        },
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
+                    "name": "get_mobility_options",
+                    "description": "Get documented transportation connections for an attraction or lodging property, with verification status",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "attraction_id": {"type": "string"},
+                            "lodging_id": {"type": "string"}
+                        },
+                        "required": []
+                    }
+                }
+            },
+            {
+                "type": "function",
+                "function": {
                     "name": "get_itinerary_templates",
                     "description": "Get available itinerary templates",
                     "parameters": {
@@ -64,7 +138,9 @@ class CayugaCompassAgent:
                         "properties": {
                             "interests": {"type": "array", "items": {"type": "string"}},
                             "days": {"type": "integer", "default": 1},
-                            "mobility": {"type": "string", "default": "car"}
+                            "mobility": {"type": "string", "default": "car", "description": "walk, transit, bike, or car"},
+                            "season_month": {"type": "integer", "description": "Travel month 1-12 for seasonal filtering"},
+                            "lodging_id": {"type": "string", "description": "Lodging property ID to anchor recommendations"}
                         },
                         "required": ["interests"]
                     }
@@ -149,6 +225,16 @@ class CayugaCompassAgent:
                 return self._get_visitor_profile()
             elif name == "search_attractions":
                 return self._search_attractions(arguments)
+            elif name == "get_attraction_details":
+                return self._get_attraction_details(arguments)
+            elif name == "search_lodging":
+                return self._search_lodging(arguments)
+            elif name == "get_lodging_details":
+                return self._get_lodging_details(arguments)
+            elif name == "search_transportation":
+                return self._search_transportation(arguments)
+            elif name == "get_mobility_options":
+                return self._get_mobility_options(arguments)
             elif name == "get_itinerary_templates":
                 return self._get_itinerary_templates()
             elif name == "generate_itinerary":
@@ -183,6 +269,65 @@ class CayugaCompassAgent:
             attractions = [a for a in attractions if a["category"] == args["category"]]
         return {"attractions": attractions}
 
+    def _get_attraction_details(self, args: Dict) -> Dict:
+        with open(self.data_dir / "attractions.json", "r") as f:
+            data = json.load(f)
+        for a in data["attractions"]:
+            if a["id"] == args.get("attraction_id"):
+                return {"attraction": a}
+        return {"error": f"Attraction not found: {args.get('attraction_id')}"}
+
+    def _search_lodging(self, args: Dict) -> Dict:
+        path = self.data_dir / "lodging.json"
+        if not path.exists():
+            return {"properties": []}
+        with open(path, "r") as f:
+            data = json.load(f)
+        properties = data["properties"]
+        if args.get("query"):
+            q = args["query"].lower()
+            properties = [p for p in properties if q in p["name"].lower() or q in p["description"].lower() or q in p["area"].lower()]
+        if args.get("accommodation_type"):
+            properties = [p for p in properties if p["accommodation_type"] == args["accommodation_type"]]
+        return {"properties": properties}
+
+    def _get_lodging_details(self, args: Dict) -> Dict:
+        with open(self.data_dir / "lodging.json", "r") as f:
+            data = json.load(f)
+        for p in data["properties"]:
+            if p["id"] == args.get("lodging_id"):
+                return {"property": p}
+        return {"error": f"Property not found: {args.get('lodging_id')}"}
+
+    def _search_transportation(self, args: Dict) -> Dict:
+        path = self.data_dir / "transportation.json"
+        if not path.exists():
+            return {"services": []}
+        with open(path, "r") as f:
+            data = json.load(f)
+        services = data["services"]
+        if args.get("query"):
+            q = args["query"].lower()
+            services = [s for s in services if q in s["name"].lower() or q in s["provider"].lower()]
+        if args.get("scope"):
+            services = [s for s in services if s["scope"] == args["scope"]]
+        if args.get("mode"):
+            services = [s for s in services if s["mode"] == args["mode"]]
+        return {"services": services}
+
+    def _get_mobility_options(self, args: Dict) -> Dict:
+        path = self.data_dir / "mobility_connections.json"
+        if not path.exists():
+            return {"connections": []}
+        with open(path, "r") as f:
+            data = json.load(f)
+        conns = data["connections"]
+        if args.get("attraction_id"):
+            conns = [c for c in conns if c.get("attraction_id") == args["attraction_id"]]
+        if args.get("lodging_id"):
+            conns = [c for c in conns if c.get("lodging_id") == args["lodging_id"]]
+        return {"connections": conns}
+
     def _get_itinerary_templates(self) -> Dict:
         with open(self.data_dir / "itineraries.json", "r") as f:
             return json.load(f)
@@ -193,7 +338,10 @@ class CayugaCompassAgent:
         return gen.generate(
             args.get("interests", []),
             args.get("days", 1),
-            args.get("mobility", "car")
+            args.get("mobility", "car"),
+            args.get("attraction_ids"),
+            args.get("season_month"),
+            args.get("lodging_id"),
         )
 
     def _search_alternatives(self, args: Dict) -> Dict:
@@ -229,7 +377,10 @@ class CayugaCompassAgent:
                 {"name": "US EPA GHG Emission Factors Hub", "year": 2025},
                 {"name": "US EPA Supply Chain GHG Emission Factors v1.3", "year": 2022},
                 {"name": "UK DESNZ GHG Conversion Factors", "year": "Latest"},
-                {"name": "Tompkins County Visitor Profile Study", "year": 2024}
+                {"name": "Tompkins County Visitor Profile Study", "year": 2024},
+                {"name": "STAMP Deliverable 1: Attractions & Experiences (all links checked)", "year": "2026-11-16"},
+                {"name": "Transportation Research (Josh Lee)", "year": 2026},
+                {"name": "Lodging Research (Deliverable 2)", "year": 2026}
             ],
-            "methodology": "Deterministic carbon calculation with research-based emission factors"
+            "methodology": "Deterministic carbon calculation with research-based emission factors; tourism data is research-documented with per-record verification status"
         }

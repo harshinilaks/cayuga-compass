@@ -75,6 +75,8 @@ export default function PlanPage() {
   const [attractions, setAttractions] = useState<any[]>([]);
   const [selectedAttractions, setSelectedAttractions] = useState<string[]>([]);
   const [alternatives, setAlternatives] = useState<any>(null);
+  const [lodgingProperties, setLodgingProperties] = useState<any[]>([]);
+  const [selectedLodging, setSelectedLodging] = useState<string>('');
 
   useEffect(() => {
     fetch('http://localhost:8000/api/personas/')
@@ -84,6 +86,10 @@ export default function PlanPage() {
     fetch('http://localhost:8000/api/attractions/')
       .then(res => res.json())
       .then(data => setAttractions(data.attractions || []))
+      .catch(() => {});
+    fetch('http://localhost:8000/api/lodging/')
+      .then(res => res.json())
+      .then(data => setLodgingProperties(data.properties || []))
       .catch(() => {});
   }, []);
 
@@ -288,6 +294,7 @@ export default function PlanPage() {
           days: tripData.days,
           mobility: 'transit',
           attraction_ids: selectedAttractions,
+          lodging_id: selectedLodging || null,
         }),
       });
       const itineraryData = await itineraryRes.json();
@@ -428,7 +435,7 @@ export default function PlanPage() {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-8 text-sm">
-              <Link href="/" className="text-gray-600 hover:text-gray-900">Explore</Link>
+              <Link href="/explore" className="text-gray-600 hover:text-gray-900">Explore</Link>
               <Link href="/plan" className="text-gray-900 font-medium">Plan your trip</Link>
               <Link href="/methodology" className="text-gray-600 hover:text-gray-900">Sustainability</Link>
             </div>
@@ -628,6 +635,36 @@ export default function PlanPage() {
                     <p className="text-xs text-green-600 mt-2">Zero incremental emissions assumed</p>
                   )}
                 </div>
+
+                {lodgingProperties.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Staying at a researched property? <span className="text-gray-400 font-normal">(optional)</span>
+                    </label>
+                    <select
+                      value={selectedLodging}
+                      onChange={(e) => setSelectedLodging(e.target.value)}
+                      className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                    >
+                      <option value="">Not listed / prefer not to say</option>
+                      {lodgingProperties.map((p) => (
+                        <option key={p.id} value={p.id}>{p.name}</option>
+                      ))}
+                    </select>
+                    {selectedLodging && (() => {
+                      const prop = lodgingProperties.find(p => p.id === selectedLodging);
+                      if (!prop) return null;
+                      return (
+                        <p className="text-xs text-gray-500 mt-2 bg-gray-50 p-2 rounded">
+                          {prop.emissions_factor_note || 'No property-level emissions factor.'}
+                          {prop.car_free_feasible
+                            ? ' Documented as car-free feasible — we\'ll use this to tailor your itinerary.'
+                            : ' Limited transportation access documented — itineraries will note this.'}
+                        </p>
+                      );
+                    })()}
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Number of nights</label>

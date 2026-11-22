@@ -1,0 +1,214 @@
+{
+  "metadata": {
+    "description": "Documented attraction/lodging to transportation-service relationships. Only connections stated in the research are included; a bus route passing near an attraction does NOT count as confirmed access. Status: confirmed_year_round | summer_only | provisional | corridor_only | walking_route | requires_confirmation."
+  },
+  "connections": [
+    {
+      "attraction_id": "cornell_lab_ornithology",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 31",
+      "status": "confirmed_year_round",
+      "source": "birds.cornell.edu (getting here, TCAT 31) via STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "museum_of_the_earth",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 21",
+      "status": "provisional",
+      "source": "Open Green Map (TCAT 21) - older listing; requires confirmation",
+      "verification_note": "Route 21 citation comes from an older listing; confirm current service on tcatbus.com"
+    },
+    {
+      "attraction_id": "taughannock_falls",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 22 (weekdays) and Route 23 (weekends)",
+      "status": "summer_only",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf; Transit app (TCAT 23)",
+      "verification_note": "Summer-only service (roughly Memorial Day to Labor Day); confirm dates on tcatbus.com"
+    },
+    {
+      "attraction_id": "taughannock_falls",
+      "service_id": "black_diamond_trail_mobility",
+      "mode": "trail",
+      "route_detail": "North end of the Black Diamond Trail (8.4 mi from Children's Garden)",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "buttermilk_falls",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 67 (Lower Buttermilk stop)",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "treman_state_park",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 67 (Lower Treman stop, Elmira Rd at Enfield Creek); summer Route 22",
+      "status": "confirmed_year_round",
+      "source": "ithacatrails.org (Treman bus stops); TCAT Route 67 map",
+      "verification_note": "Route 22 leg is summer-only"
+    },
+    {
+      "attraction_id": "cayuga_nature_center",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 22",
+      "status": "summer_only",
+      "source": "TCAT Route 22 map via STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "farmers_market",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 13",
+      "status": "confirmed_year_round",
+      "source": "Cornell Chronicle (TCAT to Trails) via STAMP_Deliverable1_Attractions.pptx.pdf",
+      "verification_note": "Market moves to Triphammer Marketplace Jan-Mar; Route 13 serves Steamboat Landing"
+    },
+    {
+      "attraction_id": "farmers_market",
+      "service_id": "cayuga_waterfront_trail_mobility",
+      "mode": "trail",
+      "route_detail": "On the Cayuga Waterfront Trail (walk or bike)",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "cayuga_waterfront_trail",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 13 at Farmers Market or Stewart Park",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "stewart_park",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Routes 13 and 36 stop nearby",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "stewart_park",
+      "service_id": "cayuga_waterfront_trail_mobility",
+      "mode": "trail",
+      "route_detail": "On the Cayuga Waterfront Trail",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "childrens_garden",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Cass Park stop",
+      "status": "summer_only",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "childrens_garden",
+      "service_id": "black_diamond_trail_mobility",
+      "mode": "trail",
+      "route_detail": "Black Diamond trailhead; on the Cayuga Waterfront Trail",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "ithaca_commons",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Main TCAT hub (Green St @ Commons)",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "history_center",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Any Commons route (located on the Commons)",
+      "status": "confirmed_year_round",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf"
+    },
+    {
+      "attraction_id": "ithaca_beer",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Route 67 runs on the Elmira Rd corridor",
+      "status": "corridor_only",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf",
+      "verification_note": "Route passes on Elmira Rd but no confirmed stop is documented; treat as requires confirmation"
+    },
+    {
+      "attraction_id": "cascadilla_gorge_trail",
+      "service_id": null,
+      "mode": "walking",
+      "route_detail": "Walking route between downtown (Linn St) and Collegetown (College Ave)",
+      "status": "walking_route",
+      "source": "STAMP_Deliverable1_Attractions.pptx.pdf",
+      "verification_note": "Trail closed late Nov to ~May"
+    },
+    {
+      "lodging_id": "statler_hotel",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT buses serve the Cornell campus",
+      "status": "confirmed_year_round",
+      "source": "Deliverable_2.pdf"
+    },
+    {
+      "lodging_id": "statler_hotel",
+      "service_id": "ithaca_airport",
+      "mode": "shuttle",
+      "route_detail": "Airport shuttle offered",
+      "status": "requires_confirmation",
+      "source": "Deliverable_2.pdf"
+    },
+    {
+      "lodging_id": "canopy_hilton",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Strong downtown TCAT access; hotel bicycles provided",
+      "status": "confirmed_year_round",
+      "source": "Deliverable_2.pdf"
+    },
+    {
+      "lodging_id": "grayhaven_motel",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Elmira Road bus corridor",
+      "status": "corridor_only",
+      "source": "Deliverable_2.pdf",
+      "verification_note": "Corridor documented; confirm nearest stop and route"
+    },
+    {
+      "lodging_id": "william_henry_miller_inn",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Downtown TCAT; walkable",
+      "status": "confirmed_year_round",
+      "source": "Deliverable_2.pdf"
+    },
+    {
+      "lodging_id": "inn_on_columbia",
+      "service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "Downtown TCAT connections",
+      "status": "confirmed_year_round",
+      "source": "Deliverable_2.pdf"
+    },
+    {
+      "service_id": "ithaca_airport",
+      "linked_service_id": "tcat",
+      "mode": "bus",
+      "route_detail": "TCAT Route 32 weekdays; Route 72 weekends",
+      "status": "confirmed_year_round",
+      "source": "Josh Lee Deliverable 2 Transportation Research.pdf"
+    }
+  ]
+}

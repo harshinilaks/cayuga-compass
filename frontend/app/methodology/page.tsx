@@ -9,7 +9,7 @@ export default function MethodologyPage() {
           <div className="flex justify-between h-16 items-center">
             <Link href="/" className="text-2xl font-bold text-green-800 tracking-tight">Cayuga Compass</Link>
             <div className="flex space-x-8 text-sm font-medium">
-              <Link href="/" className="text-gray-600 hover:text-green-700 transition-colors">Explore</Link>
+              <Link href="/explore" className="text-gray-600 hover:text-green-700 transition-colors">Explore</Link>
               <Link href="/plan" className="text-gray-600 hover:text-green-700 transition-colors">Plan Your Trip</Link>
               <Link href="/methodology" className="text-green-700">Methodology</Link>
             </div>

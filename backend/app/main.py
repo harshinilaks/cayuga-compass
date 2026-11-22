@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import emissions, personas, attractions, itineraries, alternatives, agent, distance
+from app.api import emissions, personas, attractions, itineraries, alternatives, agent, distance, lodging, transportation, mobility
 
 app = FastAPI(
     title="Cayuga Compass API",
@@ -23,6 +23,9 @@ app.include_router(itineraries.router, prefix="/api/itineraries", tags=["itinera
 app.include_router(alternatives.router, prefix="/api/alternatives", tags=["alternatives"])
 app.include_router(agent.router, prefix="/api/agent", tags=["agent"])
 app.include_router(distance.router, prefix="/api/distance", tags=["distance"])
+app.include_router(lodging.router, prefix="/api/lodging", tags=["lodging"])
+app.include_router(transportation.router, prefix="/api/transportation", tags=["transportation"])
+app.include_router(mobility.router, prefix="/api/mobility", tags=["mobility"])
 
 
 @app.get("/api/health")
