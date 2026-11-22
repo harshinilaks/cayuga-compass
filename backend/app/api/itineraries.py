@@ -11,6 +11,7 @@ class ItineraryRequest(BaseModel):
     interests: List[str]
     days: int = 1
     mobility: str = "car"
+    attraction_ids: List[str] = []
 
 
 @router.get("/templates")
@@ -26,4 +27,5 @@ def get_itinerary_templates():
 @router.post("/generate")
 def generate_itinerary(request: ItineraryRequest):
     """Generate a personalized itinerary."""
-    return generator.generate(request.interests, request.days, request.mobility)
+    return generator.generate(request.interests, request.days, request.mobility,
+                              request.attraction_ids)

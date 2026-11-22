@@ -186,6 +186,7 @@ This document synthesizes the research deliverables from the Cornell Sustainabil
 
 **Lodging Factors:**
 - Hotel (US average): 16.1000 room-night (Approximate, UK DESNZ secondary source)
+- Hotel (green-certified/efficient): 13.7000 room-night (Approximate, ~15% below US average based on CHSB-style benchmarking; replace with CHSB-derived figure when available)
 - Hotel (CHSB Ithaca/upstate NY): Unavailable (Placeholder)
 - Vacation rental/Airbnb: Unavailable (No standard source)
 - Bed & breakfast/inn: Unavailable (No standard source)

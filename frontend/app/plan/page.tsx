@@ -239,6 +239,7 @@ export default function PlanPage() {
         body: JSON.stringify(buildInputs()),
       });
       const data = await response.json();
+      setResults(null);
       setPartialResults({
         arrival: data.arrival,
         lodging: data.lodging,
@@ -286,6 +287,7 @@ export default function PlanPage() {
           interests: tripData.activities,
           days: tripData.days,
           mobility: 'transit',
+          attraction_ids: selectedAttractions,
         }),
       });
       const itineraryData = await itineraryRes.json();
@@ -349,6 +351,9 @@ export default function PlanPage() {
     tripData.transitMilesPerPerson,
     tripData.localTransportDays,
     tripData.days,
+    tripData.activities,
+    tripData.activitySpend,
+    tripData.foodCategories,
     step,
   ]);
 
@@ -976,24 +981,34 @@ export default function PlanPage() {
                         <p className="text-sm font-medium text-gray-900 mb-2">Suggested itinerary:</p>
                         <div className="space-y-2">
                           {alternatives.itinerary.stops.map((stop: any, i: number) => (
-                            <div key={i} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                              <div>
-                                <div className="font-medium text-gray-900">{stop.name}</div>
-                                <div className="text-xs text-gray-600">{stop.area} · {stop.category}</div>
-                                {stop.notes && <div className="text-xs text-gray-500">{stop.notes}</div>}
+                            <div key={i}>
+                              {(i === 0 || stop.day !== alternatives.itinerary.stops[i - 1].day) && (
+                                <p className={`text-xs font-semibold text-gray-500 uppercase tracking-wide ${i === 0 ? 'mb-1' : 'mt-4 mb-1'}`}>
+                                  Day {stop.day || 1}
+                                </p>
+                              )}
+                              {i > 0 && stop.transport_note && (
+                                <p className="text-xs text-gray-500 pl-3 pb-1">
+                                  ↓ {stop.transport_note}
+                                </p>
+                              )}
+                              <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div>
+                                  <div className="font-medium text-gray-900">{stop.name}</div>
+                                  <div className="text-xs text-gray-600">{stop.area} · {stop.category.replaceAll('_', ' ')}</div>
+                                  {stop.notes && <div className="text-xs text-gray-500">{stop.notes}</div>}
+                                </div>
+                                <div className="text-sm text-gray-500">{stop.time}</div>
                               </div>
-                              <div className="text-sm text-gray-500">{stop.time}</div>
                             </div>
                           ))}
                         </div>
-                        {alternatives.itinerary.sustainability_tips?.length > 0 && (
+                        {alternatives.itinerary.carbon_explanation && (
                           <div className="mt-3 p-3 bg-green-50 rounded-lg">
-                            <p className="text-sm font-medium text-green-800">Tips:</p>
-                            <ul className="text-sm text-green-700 list-disc pl-4 mt-1">
-                              {alternatives.itinerary.sustainability_tips.map((tip: string, i: number) => (
-                                <li key={i}>{tip}</li>
-                              ))}
-                            </ul>
+                            <p className="text-sm font-medium text-green-800">Why this route?</p>
+                            <p className="text-sm text-green-700 mt-1">
+                              {alternatives.itinerary.carbon_explanation}
+                            </p>
                           </div>
                         )}
                       </div>

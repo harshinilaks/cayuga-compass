@@ -157,6 +157,19 @@
       "limitations": "Confirm in the DESNZ 'Hotel stay' tab. Replace with upstate NY figure if available."
     },
     {
+      "id": "lodging_hotel_green_certified",
+      "category": "lodging",
+      "name": "Hotel (green-certified / efficient)",
+      "value": 13.7,
+      "unit": "room-night",
+      "source_organization": "Estimate based on Cornell Hotel Sustainability Benchmarking Index",
+      "source_document": "Derived: ~15% below US average hotel factor",
+      "publication_year": null,
+      "verification_status": "approximate",
+      "assumptions": "Certified/efficient hotels (LEED, Green Seal, Energy Star) typically benchmark 10-20% below the US average per room-night in CHSB-style data; a conservative 15% reduction is applied to the 16.1 kg US average.",
+      "limitations": "Estimate only. Replace with a CHSB-derived figure for certified properties when available."
+    },
+    {
       "id": "lodging_hotel_ithaca",
       "category": "lodging",
       "name": "Hotel (CHSB Ithaca / upstate NY)",

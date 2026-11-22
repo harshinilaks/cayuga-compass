@@ -56,17 +56,6 @@
       "verified": true
     },
     {
-      "id": "longer_stays",
-      "name": "Trip Consolidation / Longer Stays",
-      "category": "lodging",
-      "description": "Extend trips and reduce frequency of visits",
-      "geographic_coverage": "N/A",
-      "source_url": null,
-      "applicable_personas": ["all"],
-      "notes": "Fewer trips means less arrival travel per activity day",
-      "verified": true
-    },
-    {
       "id": "tcat",
       "name": "TCAT Bus",
       "category": "getting_around",

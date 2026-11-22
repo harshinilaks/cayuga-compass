@@ -263,11 +263,11 @@ class AlternativesMatcher:
                 "name": "Green-Certified Lodging",
                 "description": "Stay at eco-certified hotels or efficient inns",
                 "changes": {
-                    "lodging_type": "lodging_hotel_us_average",  # Same factor for now, but conceptually different
+                    "lodging_type": "lodging_hotel_green_certified",
                 },
                 "category": "lodging",
                 "feasibility": "medium",
-                "tradeoffs": "Look for LEED, Green Seal, or Energy Star certifications",
+                "tradeoffs": "Look for LEED, Green Seal, or Energy Star certifications. Savings use an approximate factor pending CHSB data.",
             })
 
         # If using unavailable lodging, suggest switching to verified type
@@ -283,16 +283,5 @@ class AlternativesMatcher:
                 "feasibility": "high",
                 "tradeoffs": "Your current lodging type lacks a verified emissions factor",
             })
-
-        # Suggest longer stays
-        alts.append({
-            "id": "longer_stays",
-            "name": "Longer Stay, Fewer Trips",
-            "description": "Extend your trip and visit less frequently",
-            "changes": {},  # No calculation change, but valuable advice
-            "category": "lodging",
-            "feasibility": "medium",
-            "tradeoffs": "Fewer trips means less arrival travel per activity day",
-        })
 
         return alts

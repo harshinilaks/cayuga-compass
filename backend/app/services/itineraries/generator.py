@@ -5,6 +5,17 @@ from typing import Dict, List, Optional, Tuple
 
 
 class ItineraryGenerator:
+    # Broad interest categories used by the UI/agent expand to the actual
+    # tags found on attractions (e.g. "museums" -> "museum", "art", ...).
+    INTEREST_TAGS = {
+        "hiking": {"hiking", "nature", "waterfall", "trail", "state park", "mountain"},
+        "water": {"lake", "boating", "swimming", "waterfront"},
+        "museums": {"museum", "art", "culture", "campus", "education", "architecture", "indoor"},
+        "wineries": {"winery", "cider", "tasting", "farms"},
+        "shopping": {"shopping", "dining", "downtown", "farmers market", "local food"},
+        "events": {"farmers market", "weekend", "nightlife", "festival"},
+    }
+
     def __init__(self, data_dir: str = "data"):
         self.data_dir = Path(data_dir)
         self.attractions = self._load_json("attractions.json")
@@ -147,21 +158,79 @@ class ItineraryGenerator:
             "estimated_transit_emissions_kg": round(transit_emissions, 2),
         }
 
-    def generate(self, interests: List[str], days: int, mobility: str = "car") -> Dict:
+    def _expand_interests(self, interests: List[str]) -> set:
+        """Map broad interest categories to concrete attraction tags."""
+        tags = set(interests)
+        for interest in interests:
+            tags |= self.INTEREST_TAGS.get(interest, set())
+        return tags
+
+    def _build_carbon_explanation(self, num_clusters: int, emissions: Dict) -> str:
+        """Plain-language rationale for why the route was built this way."""
+        total = emissions["total_miles"]
+        walk = emissions["walk_miles"]
+        transit = emissions["transit_miles"]
+
+        if total == 0:
+            return ("With a single stop there is no travel between attractions, "
+                    "so this visit adds no local transportation emissions.")
+
+        text = (f"Stops are grouped into {num_clusters} geographic cluster"
+                f"{'s' if num_clusters != 1 else ''} and ordered by proximity, "
+                f"which minimizes backtracking across ~{total} miles of local travel. ")
+
+        if walk > 0 and transit > 0:
+            text += (f"{walk} mi between stops are short enough to walk (zero emissions); "
+                     f"the remaining {transit} mi go on TCAT at ~0.067 kg CO2e per "
+                     f"passenger-mile, about {emissions['estimated_transit_emissions_kg']} kg total.")
+        elif walk > 0:
+            text += (f"Every leg is under 1.5 miles, so all {walk} mi between stops are "
+                     f"walkable with zero transport emissions.")
+        else:
+            text += (f"The stops are too spread out to walk, so all {transit} mi are routed "
+                     f"to TCAT at ~0.067 kg CO2e per passenger-mile, about "
+                     f"{emissions['estimated_transit_emissions_kg']} kg total.")
+
+        if transit > 0:
+            car_kg = round(total * 0.2986, 1)
+            text += (f" Driving the same route in an average gasoline car would emit "
+                     f"~{car_kg} kg CO2e per vehicle instead.")
+
+        return text
+
+    def generate(self, interests: List[str], days: int, mobility: str = "car",
+                 attraction_ids: Optional[List[str]] = None) -> Dict:
         """Generate a personalized itinerary with geographic optimization."""
+        tags = self._expand_interests(interests)
+
         # Score attractions by interest overlap
         scored = []
         for a in self.attractions["attractions"]:
-            overlap = len(set(a.get("tags", [])) & set(interests))
+            overlap = len(set(a.get("tags", [])) & tags)
             if overlap > 0:
                 scored.append((overlap, a))
 
         scored.sort(key=lambda x: x[0], reverse=True)
 
-        # Take top attractions for the trip duration
+        # Attractions the user explicitly picked always make the cut
+        pinned = []
+        seen = set()
+        for aid in (attraction_ids or []):
+            a = self._get_attraction_by_id(aid)
+            if a and a["id"] not in seen:
+                pinned.append(a)
+                seen.add(a["id"])
+
+        # Fill remaining slots with top-scored attractions
         stops_per_day = 4
-        max_stops = min(len(scored), days * stops_per_day)
-        selected = [a for _, a in scored[:max_stops]]
+        max_stops = max(len(pinned), days * stops_per_day)
+        selected = list(pinned)
+        for _, a in scored:
+            if len(selected) >= max_stops:
+                break
+            if a["id"] not in seen:
+                selected.append(a)
+                seen.add(a["id"])
 
         # Geographic clustering and route optimization
         clusters = self._cluster_attractions(selected)
@@ -207,11 +276,6 @@ class ItineraryGenerator:
             "stops": stops,
             "clusters": len(clusters),
             "local_emissions": emissions,
-            "sustainability_tips": [
-                f"Visit {len(clusters)} geographic cluster{'s' if len(clusters) > 1 else ''} to minimize travel",
-                f"Walk {emissions['walk_miles']} of {emissions['total_miles']} local miles",
-                "Use TCAT for longer distances between clusters",
-                "Choose attractions near your lodging to reduce driving",
-            ],
+            "carbon_explanation": self._build_carbon_explanation(len(clusters), emissions),
             "source": "generated_optimized",
         }

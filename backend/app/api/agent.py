@@ -50,15 +50,31 @@ def _deterministic_fallback(message: str, trip_data: Dict) -> str:
         from app.services.itineraries.generator import ItineraryGenerator
         gen = ItineraryGenerator("data")
         interests = []
-        if "hiking" in msg_lower or "nature" in msg_lower:
+        if "hiking" in msg_lower or "nature" in msg_lower or "waterfall" in msg_lower:
             interests.extend(["hiking", "nature"])
-        if "food" in msg_lower or "dining" in msg_lower:
+        if "food" in msg_lower or "dining" in msg_lower or "restaurant" in msg_lower:
             interests.extend(["dining", "local food"])
-        if "museum" in msg_lower or "culture" in msg_lower:
+        if "museum" in msg_lower or "culture" in msg_lower or "art" in msg_lower:
             interests.extend(["museum", "culture"])
+        if "wine" in msg_lower or "cider" in msg_lower or "winery" in msg_lower:
+            interests.extend(["wineries"])
+        if "shopping" in msg_lower or "downtown" in msg_lower:
+            interests.extend(["shopping", "downtown"])
+        if "campus" in msg_lower or "cornell" in msg_lower:
+            interests.extend(["campus", "education"])
         result = gen.generate(interests, 1)
-        stops = [f"{s['time']}: {s['name']} ({s['area']})" for s in result["stops"][:4]]
-        return f"Here's a suggested itinerary: {', '.join(stops)}."
+        if not result["stops"]:
+            return "I couldn't find matching attractions for your interests. Try specifying things like hiking, museums, wineries, or campus tours."
+        stops = [
+            f"  • Day {s.get('day', 1)} {s['time']}: {s['name']} ({s['area']})"
+            + (f" [{s['transport_note']}]" if s.get("transport_note") else "")
+            for s in result["stops"][:5]
+        ]
+        explanation = result.get("carbon_explanation")
+        response = f"Here's a suggested {result['name'].lower()}:\n" + "\n".join(stops)
+        if explanation:
+            response += f"\n\n{explanation}"
+        return response
 
     if "bus" in msg_lower or "tcat" in msg_lower or "transit" in msg_lower:
         return "TCAT (Tompkins Consolidated Area Transit) is a lower-carbon local transit option. The national proxy factor is ~0.0666 kg CO2e per passenger-mile. Consider using TCAT Route 81 for campus-to-downtown travel."
