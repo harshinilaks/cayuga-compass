@@ -1,8 +1,8 @@
-# STAMP Research Synthesis
+# Cayuga Compass Research Synthesis
 
 ## Document Overview
 
-This document synthesizes the research deliverables from the Cornell Sustainability Consultants team for the STAMP (Sustainable Tourism Asset Management Program) project. The research includes visitor personas, emissions calculations, feature requirements, and UI design specifications.
+This document synthesizes the research deliverables from the Cornell Sustainability Consultants team for the Cayuga Compass project (deliverables produced under the STAMP program). The research includes visitor personas, emissions calculations, feature requirements, and UI design specifications.
 
 ---
 

@@ -34,7 +34,7 @@ export default function AgentPage() {
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
-            <Link href="/" className="text-2xl font-bold text-green-800">STAMP</Link>
+            <Link href="/" className="text-2xl font-bold text-green-800">Cayuga Compass</Link>
             <div className="flex items-center space-x-6 text-sm">
               <Link href="/" className="text-gray-600 hover:text-gray-900">Explore</Link>
               <Link href="/plan" className="text-gray-600 hover:text-gray-900">Plan your trip</Link>

@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import emissions, personas, attractions, itineraries, alternatives, agent, distance
 
 app = FastAPI(
-    title="STAMP API",
-    description="Sustainable Tourism Asset Management Program - Backend API",
+    title="Cayuga Compass API",
+    description="Cayuga Compass - Sustainable tourism trip planning for Ithaca, NY",
     version="0.1.0"
 )
 

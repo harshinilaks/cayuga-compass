@@ -1,6 +1,6 @@
-# STAMP - Sustainable Tourism Asset Management Program
+# Cayuga Compass
 
-STAMP is an agentic AI-powered sustainable tourism platform for visitors to Ithaca and Tompkins County, New York. Developed by Cornell Sustainability Consultants in partnership with the Tompkins County Tourism Program.
+Cayuga Compass is an agentic AI-powered sustainable tourism platform for visitors to Ithaca and Tompkins County, New York. Developed by Cornell Sustainability Consultants in partnership with the Tompkins County Tourism Program.
 
 ## Features
 
@@ -9,7 +9,6 @@ STAMP is an agentic AI-powered sustainable tourism platform for visitors to Itha
 - **Visitor Personas**: Pre-populated scenarios for regional, leisure, and university visitors
 - **Personalized Itineraries**: Curated local tourism recommendations
 - **Sustainable Alternatives**: Lower-carbon travel options
-- **AI Travel Assistant**: Tool-calling agent for trip planning (coming soon)
 
 ## Tech Stack
 
@@ -29,7 +28,7 @@ STAMP is an agentic AI-powered sustainable tourism platform for visitors to Itha
 ## Project Structure
 
 ```
-stamp-ai/
+cayuga-compass/
 ├── frontend/          # Next.js frontend
 │   ├── app/          # App Router pages
 │   ├── components/   # React components
@@ -93,11 +92,11 @@ Visit http://localhost:3000
 - `GET /api/emissions/factors` - Get emission factors
 - `POST /api/emissions/calculate` - Calculate trip footprint
 - `POST /api/emissions/compare` - Compare trip scenarios
-- `GET /api/attractions` - Get local attractions (coming soon)
-- `GET /api/itineraries/templates` - Get itinerary templates (coming soon)
-- `POST /api/itineraries/generate` - Generate itinerary (coming soon)
-- `GET /api/alternatives` - Get sustainable alternatives (coming soon)
-- `POST /api/agent/chat` - AI agent chat (coming soon)
+- `GET /api/attractions` - Get local attractions
+- `GET /api/itineraries/templates` - Get itinerary templates
+- `POST /api/itineraries/generate` - Generate itinerary
+- `GET /api/alternatives` - Get sustainable alternatives
+- `POST /api/agent/chat` - AI agent chat
 
 ## Testing
 

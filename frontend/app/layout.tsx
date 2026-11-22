@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "STAMP - Sustainable Tourism Asset Management Program",
+  title: "Cayuga Compass - Sustainable Trip Planning for Ithaca",
   description: "Explore Ithaca sustainably. Calculate your trip's carbon footprint and discover local attractions.",
 };
 

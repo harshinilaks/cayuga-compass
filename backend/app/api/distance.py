@@ -60,7 +60,7 @@ async def geocode(query: str) -> dict:
                 "countrycodes": "us,ca"  # Limit to North America for better results
             },
             headers={
-                "User-Agent": "STAMP-CarbonCalculator/1.0"
+                "User-Agent": "CayugaCompass-CarbonCalculator/1.0"
             }
         )
         results = response.json()

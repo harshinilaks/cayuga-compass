@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Dict
-from app.services.agent.agent import StampAgent
+from app.services.agent.agent import CayugaCompassAgent
 import os
 
 router = APIRouter()
-agent = StampAgent()
+agent = CayugaCompassAgent()
 
 
 class ChatMessage(BaseModel):
@@ -90,7 +90,7 @@ async def _llm_chat(message: str, history: List[ChatMessage], trip_data: Dict) -
     import httpx
 
     tools = agent.get_tools()
-    messages = [{"role": "system", "content": "You are STAMP, a sustainable tourism assistant for Ithaca, NY. Help visitors plan lower-carbon trips, understand their carbon footprint, and discover local attractions. Always use tools for calculations - never fabricate emissions figures, routes, or business details. Be concise and helpful."}]
+    messages = [{"role": "system", "content": "You are Cayuga Compass, a sustainable tourism assistant for Ithaca, NY. Help visitors plan lower-carbon trips, understand their carbon footprint, and discover local attractions. Always use tools for calculations - never fabricate emissions figures, routes, or business details. Be concise and helpful."}]
 
     for msg in history:
         messages.append({"role": msg.role, "content": msg.content})

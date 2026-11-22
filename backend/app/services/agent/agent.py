@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 from app.services.carbon.calculator import CarbonCalculator
 
 
-class StampAgent:
+class CayugaCompassAgent:
     def __init__(self, data_dir: str = "data"):
         self.data_dir = Path(data_dir)
         self.calculator = CarbonCalculator()

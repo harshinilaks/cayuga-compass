@@ -7,7 +7,7 @@ export default function Home() {
       <nav className="bg-white/80 backdrop-blur-sm border-b border-green-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
-            <Link href="/" className="text-2xl font-bold text-green-800 tracking-tight">STAMP</Link>
+            <Link href="/" className="text-2xl font-bold text-green-800 tracking-tight">Cayuga Compass</Link>
             <div className="flex space-x-8 text-sm font-medium">
               <Link href="/" className="text-green-700">Explore</Link>
               <Link href="/plan" className="text-gray-600 hover:text-green-700 transition-colors">Plan Your Trip</Link>
